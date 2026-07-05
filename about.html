@@ -1,1812 +1,864 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About Us - Master Lady Solutions</title>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
-    <style>
-        /* ============================================
-                   ROOT VARIABLES
-                ============================================ */
-        :root {
-            --primary: #2956ff;
-            --primary-dark: #1a3fc9;
-            --primary-light: #eef2ff;
-            --dark: #0a1628;
-            --gray: #64748b;
-            --light-gray: #94a3b8;
-            --bg: #f8faff;
-            --white: #ffffff;
-            --gold: #b88922;
-            --shadow: 0 10px 40px rgba(41, 86, 255, 0.10);
-            --shadow-hover: 0 20px 60px rgba(41, 86, 255, 0.25);
-            --radius: 60px;
-            --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        /* ============================================
-                   RESET & BASE
-                ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at 20% 0%, rgba(41, 86, 255, 0.07) 0%, #f8faff 40%, #ffffff 75%);
-            color: var(--dark);
-            overflow-x: hidden;
-            line-height: 1.7;
-            direction: ltr;
-            min-height: 100vh;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        ul {
-            list-style: none;
-        }
-
-        .container {
-            width: 92%;
-            max-width: 1200px;
-            margin: auto;
-            padding: 0 15px;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* ============================================
-                   HEADER
-                ============================================ */
-        .header {
-            position: fixed;
-            width: 100%;
-            left: 0;
-            top: 0;
-            z-index: 999;
-            padding: 16px 0;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            transition: var(--transition);
-        }
-
-        .header.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
-        }
-
-        .header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* ===== LOGO ===== */
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .logo-icon {
-            width: 68px;
-            height: 68px;
-            min-width: 48px;
-            background: var(--primary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 6px 20px rgba(41, 86, 255, 0.25);
-            overflow: hidden;
-        }
-
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 12px;
-        }
-
-        .logo-icon .ml-text {
-            font-size: 22px;
-            font-weight: 900;
-            color: white;
-            letter-spacing: -2px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-
-        .logo-text h2 {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--dark);
-            letter-spacing: -0.5px;
-            margin: 0;
-        }
-
-        .logo-text span {
-            font-size: 9px;
-            letter-spacing: 5px;
-            color: var(--gold);
-            font-weight: 600;
-            text-transform: uppercase;
-            display: block;
-            margin-top: -2px;
-        }
-
-        /* Navigation */
-        .navbar ul {
-            display: flex;
-            gap: 30px;
-        }
-
-        .navbar a {
-            color: #1e293b;
-            font-weight: 600;
-            font-size: 14px;
-            position: relative;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .navbar a:hover,
-        .navbar .active {
-            color: var(--primary);
-        }
-
-        .navbar .active::after {
-            content: "";
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: -8px;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--primary);
-        }
-
-        /* Header Right */
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .theme-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: none;
-            background: var(--white);
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            color: var(--dark);
-        }
-
-        .theme-btn:hover {
-            transform: rotate(20deg);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .project-btn {
-            background: linear-gradient(135deg, #2956ff, #1a3fc9);
-            color: var(--white);
-            padding: 10px 24px;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .project-btn i {
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .project-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(41, 86, 255, 0.35);
-        }
-
-        .project-btn:hover i {
-            transform: translateX(6px);
-        }
-
-        .project-btn .btn-text {
-            display: inline;
-        }
-
-        .menu-btn {
-            display: none;
-            background: var(--white);
-            border: none;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            font-size: 20px;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            color: var(--dark);
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ============================================
-                   ABOUT SECTION
-                ============================================ */
-        .about-section {
-            padding: 120px 0 70px;
-            position: relative;
-            background: var(--bg);
-        }
-
-        /* About Container */
-        .about-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            align-items: center;
-        }
-
-        /* Left Content */
-        .about-subtitle {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .about-title {
-            font-size: 42px;
-            font-weight: 800;
-            line-height: 1.15;
-            color: var(--dark);
-            margin-bottom: 18px;
-        }
-
-        .about-title span {
-            background: linear-gradient(135deg, #2956ff, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .about-desc {
-            font-size: 16px;
-            line-height: 1.8;
-            color: var(--gray);
-            margin-bottom: 25px;
-        }
-
-        /* Features List */
-        .about-features {
-            list-style: none;
-            margin-bottom: 30px;
-        }
-
-        .about-features li {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--dark);
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-        }
-
-        .about-features li:last-child {
-            border-bottom: none;
-        }
-
-        .about-features li i {
-            font-size: 20px;
-            color: var(--primary);
-            flex-shrink: 0;
-        }
-
-        /* Trust Badge */
-        .about-trust {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: var(--white);
-            padding: 14px 22px;
-            border-radius: 14px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(41, 86, 255, 0.06);
-        }
-
-        .trust-icon {
-            width: 46px;
-            height: 46px;
-            min-width: 46px;
-            background: rgba(41, 86, 255, 0.08);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .trust-icon i {
-            font-size: 22px;
-            color: var(--primary);
-        }
-
-        .trust-text h4 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--dark);
-            margin: 0;
-        }
-
-        .trust-text p {
-            font-size: 13px;
-            color: var(--gray);
-            margin: 0;
-        }
-
-        /* Right Image */
-        .about-image {
-            position: relative;
-            text-align: center;
-        }
-
-        .about-image img {
-            width: 100%;
-            max-width: 500px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(41, 86, 255, 0.10);
-            margin: 0 auto;
-        }
-
-        /* Floating Stats */
-        .about-stats-float {
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            background: var(--white);
-            border-radius: 16px;
-            padding: 16px 20px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(41, 86, 255, 0.06);
-        }
-
-        .float-stat {
-            text-align: center;
-        }
-
-        .float-stat h4 {
-            font-size: 20px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #2956ff, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .float-stat p {
-            font-size: 11px;
-            color: var(--gray);
-            margin: 0;
-            font-weight: 500;
-        }
-
-        /* ============================================
-                   TEAM SECTION
-                ============================================ */
-        .team-section {
-            padding: 70px 0;
-            background: var(--white);
-        }
-
-        .team-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .team-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(41, 86, 255, 0.08);
-            color: var(--primary);
-            padding: 6px 18px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 13px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(41, 86, 255, 0.10);
-        }
-
-        .team-badge i {
-            font-size: 14px;
-        }
-
-        .team-title {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 10px;
-        }
-
-        .team-title span {
-            background: linear-gradient(135deg, #2956ff, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .team-desc {
-            font-size: 16px;
-            color: var(--gray);
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* Team Grid */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-        }
-
-        /* Team Card */
-        .team-card {
-            background: var(--white);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-            transition: var(--transition);
-            border: 1px solid rgba(41, 86, 255, 0.04);
-        }
-
-        .team-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(41, 86, 255, 0.08);
-        }
-
-        .team-card-image {
-            width: 100%;
-            height: 220px;
-            overflow: hidden;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        }
-
-        .team-card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .team-card:hover .team-card-image img {
-            transform: scale(1.05);
-        }
-
-        .team-card-content {
-            padding: 20px 24px 24px;
-        }
-
-        .team-card-content h4 {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 2px;
-        }
-
-        .team-card-content .position {
-            font-size: 13px;
-            color: var(--primary);
-            font-weight: 600;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .team-card-content .bio {
-            font-size: 13px;
-            color: var(--gray);
-            line-height: 1.6;
-            margin-bottom: 14px;
-            min-height: 40px;
-        }
-
-        /* Team Social */
-        .team-social {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .team-social a {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: rgba(41, 86, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gray);
-            transition: var(--transition);
-            font-size: 14px;
-        }
-
-        .team-social a:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(41, 86, 255, 0.25);
-        }
-
-        /* ============================================
-                   STORY SECTION
-                ============================================ */
-        .story-section {
-            padding: 70px 0;
-            background: var(--bg);
-        }
-
-        .story-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            align-items: center;
-        }
-
-        .story-image {
-            position: relative;
-            text-align: center;
-        }
-
-        .story-image img {
-            width: 100%;
-            max-width: 500px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(41, 86, 255, 0.08);
-            margin: 0 auto;
-        }
-
-        .story-badge-float {
-            position: absolute;
-            bottom: -18px;
-            right: 20px;
-            background: var(--white);
-            padding: 14px 20px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(41, 86, 255, 0.06);
-        }
-
-        .story-badge-icon {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            background: rgba(41, 86, 255, 0.08);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .story-badge-icon i {
-            font-size: 20px;
-            color: var(--primary);
-        }
-
-        .story-badge-float h4 {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--dark);
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .story-badge-float p {
-            font-size: 11px;
-            color: var(--gray);
-            margin: 0;
-        }
-
-        .story-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .story-tag i {
-            font-size: 13px;
-        }
-
-        .story-title {
-            font-size: 36px;
-            font-weight: 800;
-            line-height: 1.2;
-            color: var(--dark);
-            margin-bottom: 18px;
-        }
-
-        .story-title span {
-            background: linear-gradient(135deg, #2956ff, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .story-desc {
-            font-size: 16px;
-            line-height: 1.8;
-            color: var(--gray);
-            margin-bottom: 24px;
-        }
-
-        .story-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 15px;
-            transition: var(--transition);
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        .story-btn i {
-            transition: var(--transition);
-            font-size: 16px;
-        }
-
-        .story-btn:hover {
-            color: var(--primary-dark);
-        }
-
-        .story-btn:hover i {
-            transform: translateX(6px);
-        }
-
-        /* ============================================
-                   FOOTER
-                ============================================ */
-        .footer {
-            background: var(--dark);
-            color: #94a3b8;
-            padding: 50px 0 0;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.5fr;
-            gap: 35px;
-            padding-bottom: 35px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .footer-brand .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 14px;
-            justify-content: flex-start;
-        }
-
-        .footer-brand .logo-icon {
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(41, 86, 255, 0.25);
-        }
-
-        .footer-brand .logo-icon .ml-text {
-            font-size: 18px;
-            font-weight: 900;
-            color: white;
-            letter-spacing: -2px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .footer-brand .logo-text h2 {
-            font-size: 20px;
-            font-weight: 800;
-            color: white;
-            letter-spacing: -0.5px;
-            margin: 0;
-        }
-
-        .footer-brand .logo-text span {
-            font-size: 8px;
-            letter-spacing: 4px;
-            color: var(--gold);
-            font-weight: 600;
-            text-transform: uppercase;
-            display: block;
-            margin-top: -2px;
-        }
-
-        .footer-desc {
-            font-size: 14px;
-            line-height: 1.7;
-            color: #94a3b8;
-            max-width: 320px;
-            margin-bottom: 16px;
-        }
-
-        .footer-social {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .footer-social a {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            transition: var(--transition);
-            font-size: 14px;
-        }
-
-        .footer-social a:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(41, 86, 255, 0.30);
-        }
-
-        .footer-links h4,
-        .footer-contact h4 {
-            font-size: 16px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 14px;
-            position: relative;
-        }
-
-        .footer-links h4::after,
-        .footer-contact h4::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 24px;
-            height: 2px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-
-        .footer-links ul {
-            list-style: none;
-            margin-top: 10px;
-        }
-
-        .footer-links ul li {
-            margin-bottom: 8px;
-        }
-
-        .footer-links ul li a {
-            color: #94a3b8;
-            transition: var(--transition);
-            font-size: 14px;
-        }
-
-        .footer-links ul li a:hover {
-            color: white;
-        }
-
-        .footer-contact ul {
-            list-style: none;
-            margin-top: 10px;
-        }
-
-        .footer-contact ul li {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 13px;
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-
-        .footer-contact ul li i {
-            color: var(--primary);
-            font-size: 16px;
-            margin-top: 2px;
-            flex-shrink: 0;
-            width: 18px;
-        }
-
-        .footer-contact ul li a {
-            color: #94a3b8;
-            transition: var(--transition);
-        }
-
-        .footer-contact ul li a:hover {
-            color: white;
-        }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0 25px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .footer-bottom p {
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .footer-bottom p strong {
-            color: white;
-        }
-
-        .footer-bottom-links {
-            display: flex;
-            gap: 18px;
-            flex-wrap: wrap;
-        }
-
-        .footer-bottom-links a {
-            font-size: 13px;
-            color: #64748b;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .footer-bottom-links a::after {
-            content: '|';
-            position: absolute;
-            right: -11px;
-            color: #334155;
-        }
-
-        .footer-bottom-links a:last-child::after {
-            display: none;
-        }
-
-        .footer-bottom-links a:hover {
-            color: white;
-        }
-
-        /* ============================================
-                   ANIMATIONS
-                ============================================ */
-        @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .about-container,
-        .team-grid,
-        .story-container {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        /* ============================================
-                   RESPONSIVE
-                ============================================ */
-
-        /* Tablet */
-        @media (max-width: 992px) {
-            .about-container {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                text-align: center;
-            }
-
-            .about-features li {
-                justify-content: center;
-            }
-
-            .about-trust {
-                justify-content: center;
-            }
-
-            .about-image img {
-                max-width: 100%;
-            }
-
-            .about-stats-float {
-                position: relative;
-                bottom: 0;
-                transform: none;
-                left: 0;
-                width: 100%;
-                margin-top: 20px;
-            }
-
-            .story-container {
-                grid-template-columns: 1fr;
-                gap: 40px;
-                text-align: center;
-            }
-
-            .story-tag {
-                justify-content: center;
-            }
-
-            .story-badge-float {
-                right: 50%;
-                transform: translateX(50%);
-                bottom: -15px;
-            }
-
-            .story-image img {
-                max-width: 100%;
-            }
-
-            .team-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 30px;
-            }
-
-            .footer-brand {
-                grid-column: 1 / -1;
-            }
-
-            .footer-desc {
-                max-width: 100%;
-            }
-        }
-
-        /* Mobile */
-        @media (max-width: 768px) {
-            /* Header */
-            .header {
-                padding: 12px 0;
-            }
-
-            .navbar ul {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: var(--white);
-                padding: 20px;
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.10);
-                border-radius: 0 0 20px 20px;
-                gap: 14px;
-                text-align: center;
-            }
-
-            .navbar ul.open {
-                display: flex;
-            }
-
-            .menu-btn {
-                display: flex;
-            }
-
-            .project-btn .btn-text {
-                display: none;
-            }
-
-            .project-btn {
-                padding: 10px 14px;
-            }
-
-            .logo-icon {
-                width: 40px;
-                height: 40px;
-                min-width: 40px;
-            }
-
-            .logo-text h2 {
-                font-size: 18px;
-            }
-
-            .logo-text span {
-                font-size: 7px;
-                letter-spacing: 3px;
-            }
-
-            /* About */
-            .about-section {
-                padding: 100px 0 50px;
-            }
-
-            .about-title {
-                font-size: 30px;
-            }
-
-            .about-desc {
-                font-size: 15px;
-            }
-
-            .about-features li {
-                font-size: 14px;
-            }
-
-            .about-stats-float {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                padding: 12px;
-            }
-
-            .float-stat h4 {
-                font-size: 18px;
-            }
-
-            .float-stat p {
-                font-size: 10px;
-            }
-
-            .about-trust {
-                flex-direction: column;
-                text-align: center;
-                padding: 16px 20px;
-            }
-
-            /* Team */
-            .team-section {
-                padding: 50px 0;
-            }
-
-            .team-title {
-                font-size: 28px;
-            }
-
-            .team-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 16px;
-            }
-
-            .team-card-image {
-                height: 160px;
-            }
-
-            .team-card-content {
-                padding: 16px 16px 18px;
-            }
-
-            .team-card-content h4 {
-                font-size: 16px;
-            }
-
-            .team-card-content .bio {
-                font-size: 12px;
-                min-height: 30px;
-            }
-
-            .team-social a {
-                width: 30px;
-                height: 30px;
-                font-size: 12px;
-            }
-
-            /* Story */
-            .story-section {
-                padding: 50px 0;
-            }
-
-            .story-title {
-                font-size: 28px;
-            }
-
-            .story-desc {
-                font-size: 15px;
-            }
-
-            .story-badge-float {
-                padding: 10px 14px;
-                gap: 10px;
-            }
-
-            .story-badge-icon {
-                width: 34px;
-                height: 34px;
-                min-width: 34px;
-            }
-
-            .story-badge-icon i {
-                font-size: 16px;
-            }
-
-            .story-badge-float h4 {
-                font-size: 14px;
-            }
-
-            .story-badge-float p {
-                font-size: 10px;
-            }
-
-            /* Footer */
-            .footer {
-                padding: 40px 0 0;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-                padding-bottom: 25px;
-                text-align: center;
-            }
-
-            .footer-brand {
-                grid-column: 1 / -1;
-            }
-
-            .footer-brand .logo {
-                justify-content: center;
-            }
-
-            .footer-desc {
-                text-align: center;
-                margin: 0 auto 16px;
-            }
-
-            .footer-social {
-                justify-content: center;
-            }
-
-            .footer-links h4::after,
-            .footer-contact h4::after {
-                left: 50%;
-                transform: translateX(-50%);
-            }
-
-            .footer-contact ul li {
-                justify-content: center;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-                padding: 18px 0 22px;
-            }
-
-            .footer-bottom-links {
-                justify-content: center;
-                gap: 14px;
-            }
-
-            .footer-bottom-links a::after {
-                right: -9px;
-            }
-        }
-
-        /* Small Mobile */
-        @media (max-width: 480px) {
-            .container {
-                width: 95%;
-                padding: 0 10px;
-            }
-
-            .about-title {
-                font-size: 26px;
-            }
-
-            .about-stats-float {
-                grid-template-columns: 1fr 1fr;
-                gap: 6px;
-                padding: 10px;
-            }
-
-            .float-stat h4 {
-                font-size: 16px;
-            }
-
-            .float-stat p {
-                font-size: 9px;
-            }
-
-            .team-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .team-card-image {
-                height: 200px;
-            }
-
-            .team-title {
-                font-size: 24px;
-            }
-
-            .team-desc {
-                font-size: 14px;
-            }
-
-            .story-title {
-                font-size: 24px;
-            }
-
-            .story-desc {
-                font-size: 14px;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 18px;
-            }
-
-            .footer-bottom-links {
-                gap: 10px;
-            }
-
-            .footer-bottom-links a {
-                font-size: 12px;
-            }
-
-            .footer-bottom-links a::after {
-                right: -7px;
-            }
-
-            .theme-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 14px;
-            }
-
-            .menu-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 18px;
-            }
-
-            .project-btn {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-        }
-        
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إدارة الطلاب — النظام الوطني</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest">
+  </script>
+  
+  <!-- Google Font: Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS (separate from Tailwind) -->
+  <style>
+    /* ----- CSS Variables & Reset ----- */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-icon: 68px;
+    }
+    html, body {
+      background: #f6f7f9;
+      font-family: 'Cairo', system-ui, sans-serif;
+    }
+    
+    /* ----- Custom Components ----- */
+    .table-row + .table-row {
+      border-top: 1px solid #eef0f3;
+    }
+    
+    /* Custom Checkbox */
+    .chk {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid #d5d9e0;
+      border-radius: 5px;
+      display: inline-grid;
+      place-items: center;
+      background: #fff;
+      cursor: pointer;
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .chk:checked {
+      background: #059669;
+      border-color: #059669;
+    }
+    .chk:checked::after {
+      content: '';
+      width: 9px;
+      height: 9px;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      transition: width .25s ease, transform .25s ease;
+      background: #071D17;
+    }
+    .nav-item {
+      transition: background .15s, color .15s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-radius: 0.6rem;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .04);
+    }
+    .nav-item.active {
+      background: #fff;
+      color: #0b1220;
+      font-weight: 600;
+    }
+    .nav-label,
+    .brand-text,
+    .cta-label,
+    .logout-label {
+      transition: opacity .15s ease;
+      white-space: nowrap;
+    }
+    .nav-item i {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+    }
+    
+    /* Collapsed state (desktop) */
+    body.sb-collapsed .sidebar {
+      width: var(--sidebar-w-icon);
+    }
+    body.sb-collapsed .nav-item {
+      justify-content: center;
+      padding-inline: 0.4rem;
+    }
+    body.sb-collapsed .nav-label,
+    body.sb-collapsed .brand-text,
+    body.sb-collapsed .cta-label,
+    body.sb-collapsed .logout-label {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+    body.sb-collapsed .brand-row {
+      justify-content: center;
+    }
+    body.sb-collapsed .cta-btn {
+      padding: 0.6rem;
+    }
+    
+    /* Mobile sidebar (off-canvas) */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        inset-block: 0;
+        inset-inline-start: 0;
+        z-index: 60;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
+        width: 280px;
+      }
+      html[dir="rtl"] .sidebar {
+        transform: translateX(-100%);
+      }
+      body.sb-open .sidebar {
+        transform: translateX(0);
+      }
+      body.sb-open .backdrop {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+    
+    /* Backdrop */
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 26, 36, .5);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    
+    /* Badge with dot */
+    .badge-dot::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 9999px;
+      background: currentColor;
+      display: inline-block;
+      margin-inline-end: 5px;
+      vertical-align: middle;
+    }
+    
+    /* Dropdown menu */
+    .menu-dropdown {
+      display: none;
+      animation: pop .12s ease-out;
+      transform-origin: top center;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      inset-inline-end: 2.8rem;
+      z-index: 20;
+      width: 11rem;
+      border-radius: 0.6rem;
+      background: #fff;
+      box-shadow: 0 10px 30px -10px rgba(16,24,40,.15);
+      border: 1px solid #f1f5f9;
+      padding: 0.3rem;
+    }
+    .menu-dropdown.show {
+      display: block;
+    }
+    .menu-dropdown button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-radius: 0.4rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      color: #334155;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .menu-dropdown button:hover {
+      background: #f8fafc;
+    }
+    .menu-dropdown button i {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+    .menu-dropdown .text-rose-600 {
+      color: #e11d48;
+    }
+    .menu-dropdown .text-rose-600:hover {
+      background: #fff1f2;
+    }
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(-50%) scale(.96); }
+      to { opacity: 1; transform: translateY(-50%) scale(1); }
+    }
+    
+    /* Page buttons */
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #475467;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .page-btn:hover {
+      background: #f2f4f7;
+    }
+    .page-btn.active {
+      background: #059669;
+      color: #fff;
+    }
+    
+    /* Icon button */
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #475467;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      background: #f2f4f7;
+    }
+    .icon-btn i {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+    
+    /* Avatar */
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 600;
+      color: #fff;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    
+    /* Responsive helpers */
+    .only-desktop { display: inline-grid; }
+    .only-mobile { display: none; }
+    @media (max-width: 768px) {
+      .only-desktop { display: none; }
+      .only-mobile { display: inline-grid; }
+    }
+    
+    /* Brand row */
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1rem 0.8rem;
+    }
+    .brand-row .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 0.6rem;
+      background: #059669;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .brand-row .brand-icon i {
+      width: 1.1rem;
+      height: 1.1rem;
+      color: #fff;
+    }
+    .brand-text .brand-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .brand-text .brand-sub {
+      color: #94a3b8;
+      font-size: 0.65rem;
+    }
+    
+    /* CTA button */
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+      border-radius: 0.6rem;
+      background: #10b981;
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+      box-shadow: 0 8px 20px -8px rgba(16, 185, 129, 0.3);
+    }
+    .cta-btn:hover {
+      background: #34d399;
+    }
+    .cta-btn i {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+    
+    /* === RESPONSIVE TABLET & MOBILE === */
+    /* Tablets (768px - 1024px) */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .sidebar {
+        width: 220px;
+      }
+      body.sb-collapsed .sidebar {
+        width: 60px;
+      }
+      .row-grid {
+        grid-template-columns: 36px 1.2fr 1fr 0.8fr 36px !important;
+        gap: 0.6rem !important;
+        padding-inline: 0.8rem !important;
+      }
+      .table-row .font-semibold {
+        font-size: 0.85rem;
+      }
+      .table-row .text-xs {
+        font-size: 0.7rem;
+      }
+      .table-row .avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+      }
+      .brand-text .brand-title {
+        font-size: 0.85rem;
+      }
+      .brand-text .brand-sub {
+        font-size: 0.6rem;
+      }
+    }
+    
+    /* Mobile (up to 768px) */
+    @media (max-width: 768px) {
+      /* Sidebar */
+      .sidebar {
+        width: 280px;
+      }
+      
+      /* Table grid - keep all columns but make them smaller */
+      .row-grid {
+        grid-template-columns: 32px 1.2fr 1fr 0.8fr 32px !important;
+        gap: 0.4rem !important;
+        padding-inline: 0.5rem !important;
+      }
+      
+      /* Hide email/phone column on small tablets/phones */
+      @media (max-width: 640px) {
+        .row-grid {
+          grid-template-columns: 30px 1.2fr 0.6fr 30px !important;
+        }
+        .col-hide-md {
+          display: none !important;
+        }
+        /* Show only name, status, actions */
+        .row-grid .col-hide-md {
+          display: none !important;
+        }
+      }
+      
+      /* Very small phones */
+      @media (max-width: 480px) {
+        .row-grid {
+          grid-template-columns: 28px 1fr 28px !important;
+          gap: 0.3rem !important;
+          padding-inline: 0.4rem !important;
+        }
+        .table-row .flex.items-center.gap-2 {
+          gap: 0.3rem !important;
+        }
+        .table-row .avatar {
+          width: 26px !important;
+          height: 26px !important;
+          font-size: 10px !important;
+        }
+        .table-row .font-semibold {
+          font-size: 0.75rem !important;
+        }
+        .table-row .text-xs {
+          font-size: 0.55rem !important;
+        }
+        .badge-dot {
+          font-size: 8px !important;
+          padding: 0.15rem 0.4rem !important;
+        }
+        .badge-dot::before {
+          width: 4px;
+          height: 4px;
+          margin-inline-end: 3px;
+        }
+        .icon-btn {
+          width: 26px !important;
+          height: 26px !important;
+        }
+        .icon-btn i {
+          width: 0.9rem !important;
+          height: 0.9rem !important;
+        }
+        .page-btn {
+          width: 26px !important;
+          height: 26px !important;
+          font-size: 11px !important;
+        }
+        .page-btn i {
+          width: 0.9rem !important;
+          height: 0.9rem !important;
+        }
+        .menu-dropdown {
+          width: 9rem !important;
+          inset-inline-end: 2.2rem !important;
+        }
+        .menu-dropdown button {
+          font-size: 0.7rem !important;
+          padding: 0.3rem 0.5rem !important;
+        }
+        .menu-dropdown button i {
+          width: 0.8rem !important;
+          height: 0.8rem !important;
+        }
+      }
+      
+      /* Table cells styling */
+      .table-row {
+        padding-block: 0.5rem !important;
+      }
+      .table-row .font-semibold {
+        font-size: 0.8rem;
+        line-height: 1.2;
+      }
+      .table-row .text-xs {
+        font-size: 0.6rem;
+      }
+      .table-row .avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+      .badge-dot {
+        font-size: 9px !important;
+        padding: 0.15rem 0.5rem !important;
+      }
+      
+      /* Header row */
+      .row-grid .font-medium {
+        font-size: 0.65rem !important;
+      }
+      .row-grid .chk {
+        width: 16px !important;
+        height: 16px !important;
+      }
+      
+      /* Pagination */
+      .pagination-text {
+        font-size: 0.6rem !important;
+      }
+    }
+    
+    /* Table column visibility */
+    .col-hide-md {
+      display: block;
+    }
+    @media (max-width: 900px) {
+      .col-hide-md {
+        display: none;
+      }
+    }
+    @media (max-width: 640px) {
+      .col-hide-sm {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
+<body class="text-[14px] text-slate-800">
 
-<body>
+  <!-- Main container with RTL direction -->
+  <div class="min-h-screen flex" style="direction: rtl;">
 
-    <!-- ===== HEADER ===== -->
-    <header class="header" id="header">
-        <div class="container">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">
-                <img src="images/logo.png" alt="Master Lady Logo" />
-                </div>
-                <div class="logo-text">
-                    <h3>Master Lady</h3>
-                </div>
-            </a>
-
-            <nav class="navbar">
-                <ul id="navMenu">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html" class="active">About</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="portfolio.html">Portfolio</a></li>
-                    <!-- <li><a href="pricing.html">Pricing</a></li> -->
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-
-            <div class="header-right">
-                <button class="theme-btn" id="themeToggle">
-                    <i class="bi bi-moon"></i>
-                </button>
-                <a href="quote.html" class="project-btn">
-                    <span class="btn-text">Start Project</span>
-                    <i class="bi bi-arrow-right"></i>
-                </a>
-                <button class="menu-btn" id="menuToggle">
-                    <i class="bi bi-list"></i>
-                </button>
-            </div>
+    <!-- Main content -->
+    <main class="flex-1 min-w-0 order-2">
+      <!-- Top bar -->
+      <header class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-3 md:py-4">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2.5 py-0.5 text-xs font-semibold">٢٤٨ طالب</span>
+          <h1 class="text-base md:text-lg font-bold text-slate-900">الطلاب</h1>
         </div>
-    </header>
 
-    <!-- ===== ABOUT SECTION ===== -->
-    <section class="about-section" id="about">
-        <div class="container">
-            <div class="about-container">
-                <!-- Left Content -->
-                <div class="about-content">
-                    <div class="about-subtitle">ABOUT US</div>
-                    <h2 class="about-title">
-                        We Are Here to Grow Your <span>Business</span> Exponentially
-                    </h2>
-                    <p class="about-desc">
-                        Master Lady Solutions is a digital agency passionate about turning ideas
-                        into real digital products. We build modern websites, applications, and
-                        digital experiences that help businesses grow and succeed in the digital world.
-                    </p>
-
-                    <!-- Features -->
-                    <ul class="about-features">
-                        <li>
-                            <i class="bi bi-check-circle-fill"></i>
-                            We create fast, secure & scalable solutions
-                        </li>
-                        <li>
-                            <i class="bi bi-check-circle-fill"></i>
-                            Professional team with years of experience
-                        </li>
-                        <li>
-                            <i class="bi bi-check-circle-fill"></i>
-                            Committed to quality and client satisfaction
-                        </li>
-                    </ul>
-
-                    <!-- Trust Badge -->
-                    <div class="about-trust">
-                        <div class="trust-icon">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <div class="trust-text">
-                            <h4>Trusted Company</h4>
-                            <p>We are trusted by thousands of clients worldwide</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Image -->
-                <div class="about-image">
-                    <img src="images/about.png" alt="About Us" />
-
-                    <!-- Floating Stats -->
-                    <div class="about-stats-float">
-                        <div class="float-stat">
-                            <h4>150+</h4>
-                            <p>Happy Clients</p>
-                        </div>
-                        <div class="float-stat">
-                            <h4>250+</h4>
-                            <p>Projects Completed</p>
-                        </div>
-                        <div class="float-stat">
-                            <h4>5+</h4>
-                            <p>Years Experience</p>
-                        </div>
-                        <div class="float-stat">
-                            <h4>24/7</h4>
-                            <p>Support</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="mx-auto hidden md:flex items-center gap-2">
+          <div class="relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-3 text-slate-400"></i>
+            <input type="text" placeholder="بحث عن طالب..."
+              class="w-[260px] rounded-lg border border-slate-200 bg-white ps-8 pe-3 py-2 text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500">
+          </div>
+          <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+            تصفية
+          </button>
         </div>
-    </section>
 
-    <!-- ===== TEAM SECTION ===== -->
-    <section class="team-section">
-        <div class="container">
-            <div class="team-header">
-                <div class="team-badge">
-                    <i class="bi bi-people-fill"></i>
-                    Our Team
-                </div>
-                <h2 class="team-title">
-                    Meet Our <span>Professional</span> Team
-                </h2>
-                <p class="team-desc">
-                    We have a dedicated team of experts passionate about delivering excellence
-                </p>
-            </div>
+        <div class="ms-auto flex items-center gap-2 md:gap-2.5">
+          <button class="icon-btn relative">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span class="absolute top-1.5 end-1.5 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+          </button>
+          <img class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover ring-2 ring-white shadow" src="https://i.pravatar.cc/80?img=47" alt="User">
 
-            <div class="team-grid">
-                <!-- Member 1 -->
-                <div class="team-card">
-                    <div class="team-card-image">
-                        <img src="images/team1.png" alt="John Doe" />
-                    </div>
-                    <div class="team-card-content">
-                        <h4>John Doe</h4>
-                        <span class="position">CEO & Founder</span>
-                        <p class="bio">Visionary leader with 10+ years of experience in digital innovation.</p>
-                        <div class="team-social">
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
-                            <a href="#"><i class="bi bi-twitter"></i></a>
-                            <a href="#"><i class="bi bi-github"></i></a>
-                            <a href="#"><i class="bi bi-envelope"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member 2 -->
-                <div class="team-card">
-                    <div class="team-card-image">
-                        <img src="images/team2.png" alt="Jane Smith" />
-                    </div>
-                    <div class="team-card-content">
-                        <h4>Jane Smith</h4>
-                        <span class="position">Lead Designer</span>
-                        <p class="bio">Creative designer specialized in UI/UX with a passion for beautiful experiences.</p>
-                        <div class="team-social">
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
-                            <a href="#"><i class="bi bi-dribbble"></i></a>
-                            <a href="#"><i class="bi bi-behance"></i></a>
-                            <a href="#"><i class="bi bi-envelope"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member 3 -->
-                <div class="team-card">
-                    <div class="team-card-image">
-                        <img src="images/team1.png" alt="Mike Johnson" />
-                    </div>
-                    <div class="team-card-content">
-                        <h4>Mike Johnson</h4>
-                        <span class="position">Senior Developer</span>
-                        <p class="bio">Full-stack developer expert in building scalable web applications.</p>
-                        <div class="team-social">
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
-                            <a href="#"><i class="bi bi-github"></i></a>
-                            <a href="#"><i class="bi bi-stack-overflow"></i></a>
-                            <a href="#"><i class="bi bi-envelope"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member 4 -->
-                <div class="team-card">
-                    <div class="team-card-image">
-                        <img src="images/team2.png" alt="Sarah Williams" />
-                    </div>
-                    <div class="team-card-content">
-                        <h4>Sarah Williams</h4>
-                        <span class="position">Marketing Manager</span>
-                        <p class="bio">Digital marketing strategist helping brands grow their online presence.</p>
-                        <div class="team-social">
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
-                            <a href="#"><i class="bi bi-twitter"></i></a>
-                            <a href="#"><i class="bi bi-instagram"></i></a>
-                            <a href="#"><i class="bi bi-envelope"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member 5 -->
-                <div class="team-card">
-                    <div class="team-card-image">
-                        <img src="images/team2.png" alt="Alex Rivera" />
-                    </div>
-                    <div class="team-card-content">
-                        <h4>Alex Rivera</h4>
-                        <span class="position">Project Manager</span>
-                        <p class="bio">Experienced project manager ensuring smooth delivery of projects on time.</p>
-                        <div class="team-social">
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
-                            <a href="#"><i class="bi bi-twitter"></i></a>
-                            <a href="#"><i class="bi bi-github"></i></a>
-                            <a href="#"><i class="bi bi-envelope"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member 6 -->
-                <div class="team-card">
-                    <div class="team-card-image">
-                        <img src="images/team1.png" alt="Emily Chen" />
-                    </div>
-                    <div class="team-card-content">
-                        <h4>Emily Chen</h4>
-                        <span class="position">Content Strategist</span>
-                        <p class="bio">Creative content writer and strategist who crafts compelling stories.</p>
-                        <div class="team-social">
-                            <a href="#"><i class="bi bi-linkedin"></i></a>
-                            <a href="#"><i class="bi bi-twitter"></i></a>
-                            <a href="#"><i class="bi bi-medium"></i></a>
-                            <a href="#"><i class="bi bi-envelope"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <button id="sb-toggle" aria-label="Toggle sidebar" class="icon-btn border border-slate-200 bg-white">
+            <i data-lucide="panel-right" class="w-4 h-4 only-desktop"></i>
+            <i data-lucide="menu" class="w-4 h-4 only-mobile"></i>
+          </button>
         </div>
-    </section>
+      </header>
 
-    <!-- ===== STORY SECTION ===== -->
-    <section class="story-section">
-        <div class="container">
-            <div class="story-container">
-                <!-- Left Image -->
-                <div class="story-image">
-                    <img src="images/ourstory.png" alt="Our Story" />
-
-                    <!-- Floating Badge -->
-                    <div class="story-badge-float">
-                        <div class="story-badge-icon">
-                            <i class="bi bi-graph-up-arrow"></i>
-                        </div>
-                        <div>
-                            <h4>250+</h4>
-                            <p>Projects Delivered</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Content -->
-                <div class="story-content">
-                    <div class="story-tag">
-                        <i class="bi bi-bookmark-fill"></i>
-                        OUR STORY
-                    </div>
-                    <h2 class="story-title">
-                        From a Small Idea to a Digital Agency Helping <span>Businesses</span> Grow Worldwide
-                    </h2>
-                    <p class="story-desc">
-                        Master Lady Solutions was founded with a simple mission: to create digital solutions
-                        that make a real impact. Over the years, we've grown into a full-service digital agency
-                        trusted by hundreds of clients around the world.
-                    </p>
-                    <a href="#" class="story-btn">
-                        Learn More
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
+      <!-- Mobile search row -->
+      <div class="md:hidden px-3 pb-2 flex items-center gap-2">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-2.5 text-slate-400"></i>
+          <input type="text" placeholder="بحث عن طالب..."
+            class="w-full rounded-lg border border-slate-200 bg-white ps-8 pe-3 py-1.5 text-xs">
         </div>
-    </section>
+        <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs">
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <!-- Brand -->
-                <div class="footer-brand">
-                    <div class="logo">
-                        <div class="logo-icon">
-                            <span class="ml-text">ML</span>
-                        </div>
-                        <div class="logo-text">
-                            <h2 style="color: white;">Master Lady</h2>
-                            <span>SOLUTIONS</span>
-                        </div>
-                    </div>
-                    <p class="footer-desc">
-                        We create modern websites, applications, and digital experiences that help businesses grow and succeed in the digital world.
-                    </p>
-                    <div class="footer-social">
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-twitter"></i></a>
-                        <a href="#"><i class="bi bi-linkedin"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
-                        <a href="#"><i class="bi bi-youtube"></i></a>
-                    </div>
-                </div>
+      <!-- Content -->
+      <div class="px-3 md:px-6 pb-8">
 
-                <!-- Quick Links -->
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="services.html">Services</a></li>
-                        <li><a href="portfolio.html">Portfolio</a></li>
-                        <li><a href="pricing.html">Pricing</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
+        <!-- Selection bar -->
+        <div class="rounded-xl bg-slate-900 text-white px-3 py-2 flex flex-wrap items-center gap-2 md:gap-3 shadow-card">
+          <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-brand-500">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          </span>
+          <span class="text-xs font-medium">٣ طلاب محددين</span>
 
-                <!-- Services -->
-                <div class="footer-links">
-                    <h4>Our Services</h4>
-                    <ul>
-                        <li><a href="#">Web Design</a></li>
-                        <li><a href="#">Web Development</a></li>
-                        <li><a href="#">Mobile Apps</a></li>
-                        <li><a href="#">UI/UX Design</a></li>
-                        <li><a href="#">Digital Marketing</a></li>
-                        <li><a href="#">Branding</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact -->
-                <div class="footer-contact">
-                    <h4>Get in Touch</h4>
-                    <ul>
-                        <li>
-                            <i class="bi bi-geo-alt"></i>
-                            <span>123 Digital Street, Riyadh, Saudi Arabia</span>
-                        </li>
-                        <li>
-                            <i class="bi bi-envelope"></i>
-                            <a href="mailto:info@masterlady.com">info@masterlady.com</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-telephone"></i>
-                            <a href="tel:+966500000000">+966 50 000 0000</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-clock"></i>
-                            <span>Mon - Fri: 9:00 AM - 6:00 PM</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Bottom -->
-            <div class="footer-bottom">
-                <p>&copy; 2026 <strong>Master Lady Solutions</strong>. All rights reserved.</p>
-                <div class="footer-bottom-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Cookies</a>
-                </div>
-            </div>
+          <div class="ms-auto flex items-center gap-2 md:gap-2.5">
+            <button class="inline-flex items-center gap-1.5 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30 px-2.5 py-1.5 text-xs font-medium hover:bg-rose-500/25">
+              <i data-lucide="ban" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">تعطيل الحسابات</span>
+            </button>
+            <button class="inline-flex items-center gap-1.5 rounded-lg bg-white text-slate-900 px-2.5 py-1.5 text-xs font-medium hover:bg-slate-100">
+              <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">إرسال إشعار</span>
+            </button>
+            <button class="icon-btn text-slate-300 hover:bg-white/10"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
         </div>
-    </footer>
 
-    <!-- ===== JAVASCRIPT ===== -->
-    <script>
-        // === Mobile Menu Toggle ===
-        const menuToggle = document.getElementById('menuToggle');
-        const navMenu = document.getElementById('navMenu');
+        <!-- Table card -->
+        <div class="mt-4 rounded-xl bg-white shadow-card border border-slate-100 overflow-visible">
+          <!-- Header row -->
+          <div class="row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5 text-xs text-slate-500 border-b border-slate-100">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="font-medium text-slate-600 text-xs">الاسم</div>
+            <div class="font-medium text-slate-600 col-hide-md text-xs">البريد/الهاتف</div>
+            <div class="font-medium text-slate-600 col-hide-md text-xs">المرحلة</div>
+            <div class="font-medium text-slate-600 col-hide-md text-xs">تاريخ التسجيل</div>
+            <div class="font-medium text-slate-600 flex items-center gap-1 text-xs">الحالة <i data-lucide="chevron-down" class="w-3 h-3"></i></div>
+            <div class="font-medium text-slate-600 text-xs">الإجراءات</div>
+          </div>
 
-        menuToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('open');
-            const icon = menuToggle.querySelector('i');
-            icon.classList.toggle('bi-list');
-            icon.classList.toggle('bi-x');
+          <!-- Row 1 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-amber-400" style="width:28px;height:28px;font-size:11px;">أ</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">أحمد محمود خليل</div>
+                <div class="text-xs text-slate-400">#STD-8821</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">ahmed.m@example.ps</div><div class="text-xs text-slate-400">+970 599 123 456</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">الثانوية</div>
+            <div class="col-hide-md text-slate-700 text-xs">١٢ أكتوبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu1" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu1">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-sky-400" style="width:28px;height:28px;font-size:11px;">س</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">سارة عبد الرحمن</div>
+                <div class="text-xs text-slate-400">#STD-9012</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">sara.a@example.ps</div><div class="text-xs text-slate-400">+970 568 987 654</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">إعدادية</div>
+            <div class="col-hide-md text-slate-700 text-xs">١٥ نوفمبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu2" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu2">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-violet-400" style="width:28px;height:28px;font-size:11px;">م</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">محمد يوسف العلي</div>
+                <div class="text-xs text-slate-400">#STD-7762</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">m.ali@example.ps</div><div class="text-xs text-slate-400">+970 592 555 000</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">ابتدائية</div>
+            <div class="col-hide-md text-slate-700 text-xs">٠٥ سبتمبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-slate-100 text-slate-500 px-2 py-0.5 text-[10px] font-semibold">معطل</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu3" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu3">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk"></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-rose-400" style="width:28px;height:28px;font-size:11px;">ل</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">ليلى إبراهيم جابر</div>
+                <div class="text-xs text-slate-400">#STD-4412</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">laila.j@example.ps</div><div class="text-xs text-slate-400">+970 597 111 222</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">الثانوية</div>
+            <div class="col-hide-md text-slate-700 text-xs">٢٠ ديسمبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu4" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu4">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 5 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk"></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-emerald-400" style="width:28px;height:28px;font-size:11px;">خ</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">خالد منصور</div>
+                <div class="text-xs text-slate-400">#STD-3398</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">khaled.m@example.ps</div><div class="text-xs text-slate-400">+970 594 333 444</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">إعدادية</div>
+            <div class="col-hide-md text-slate-700 text-xs">٠١ يناير ٢٠٢٤</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu5" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu5">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex flex-wrap items-center gap-2 px-3 md:px-5 py-2.5 border-t border-slate-100 text-xs text-slate-500">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px]">الصفوف لكل صفحة:</span>
+              <button class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px]">١٠ <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+            </div>
+            <div class="hidden sm:block text-[11px]">عرض ١-١٠ من ٢٤٨</div>
+            <div class="ms-auto flex items-center gap-0.5">
+              <button class="page-btn" style="width:28px;height:28px;"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٢٥</button>
+              <span class="page-btn" style="width:28px;height:28px;font-size:12px;">…</span>
+              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٣</button>
+              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٢</button>
+              <button class="page-btn active" style="width:28px;height:28px;font-size:12px;">١</button>
+              <button class="page-btn" style="width:28px;height:28px;"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Backdrop for mobile -->
+    <div class="backdrop" id="sb-backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar shrink-0 text-slate-300 flex flex-col order-1" id="sidebar">
+      <div class="brand-row">
+        <div class="brand-icon">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="brand-text text-right">
+          <div class="brand-title">إدارة التعليم</div>
+          <div class="brand-sub">النظام الوطني</div>
+        </div>
+      </div>
+
+      <nav class="mt-1.5 px-2.5 space-y-0.5 flex-1">
+        <a href="#" class="nav-item"><i data-lucide="layout-grid"></i><span class="nav-label">لوحة التحكم</span></a>
+        <a href="#" class="nav-item"><i data-lucide="book-open"></i><span class="nav-label">الدورات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="library"></i><span class="nav-label">المكتبة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="rss"></i><span class="nav-label">المدونة</span></a>
+        <a href="#" class="nav-item active"><i data-lucide="users"></i><span class="nav-label">الطلاب</span></a>
+        <a href="#" class="nav-item"><i data-lucide="message-square"></i><span class="nav-label">المحادثة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="file-text"></i><span class="nav-label">الصفحات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="settings"></i><span class="nav-label">الإعدادات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="shield-check"></i><span class="nav-label">الصلاحيات</span></a>
+      </nav>
+
+      <div class="p-3 space-y-1.5">
+        <button class="cta-btn">
+          <i data-lucide="plus"></i>
+          <span class="cta-label">إضافة دورة جديدة</span>
+        </button>
+        <a href="#" class="nav-item"><i data-lucide="log-out"></i><span class="logout-label">تسجيل الخروج</span></a>
+      </div>
+    </aside>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Sidebar toggle functionality
+    const body = document.body;
+    const toggle = document.getElementById('sb-toggle');
+    const backdrop = document.getElementById('sb-backdrop');
+    const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+    if (localStorage.getItem('sb-collapsed') === '1') {
+      body.classList.add('sb-collapsed');
+    }
+
+    toggle.addEventListener('click', () => {
+      if (isMobile()) {
+        body.classList.toggle('sb-open');
+      } else {
+        body.classList.toggle('sb-collapsed');
+        localStorage.setItem('sb-collapsed', body.classList.contains('sb-collapsed') ? '1' : '0');
+      }
+    });
+
+    backdrop.addEventListener('click', () => {
+      body.classList.remove('sb-open');
+    });
+
+    window.addEventListener('resize', () => {
+      if (!isMobile()) {
+        body.classList.remove('sb-open');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        body.classList.remove('sb-open');
+      }
+    });
+
+    // Toggle dropdown menus
+    document.querySelectorAll('.toggle-menu').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const targetId = this.getAttribute('data-target');
+        const menu = document.getElementById(targetId);
+        
+        document.querySelectorAll('.menu-dropdown').forEach(m => {
+          if (m.id !== targetId) {
+            m.classList.remove('show');
+          }
         });
+        
+        menu.classList.toggle('show');
+      });
+    });
 
-        document.querySelectorAll('.navbar a').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('open');
-                const icon = menuToggle.querySelector('i');
-                icon.classList.add('bi-list');
-                icon.classList.remove('bi-x');
-            });
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.toggle-menu') && !e.target.closest('.menu-dropdown')) {
+        document.querySelectorAll('.menu-dropdown').forEach(menu => {
+          menu.classList.remove('show');
         });
+      }
+    });
 
-        // === Header Scroll Effect ===
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-
-        // === Theme Toggle ===
-        const themeBtn = document.getElementById('themeToggle');
-        let isDark = false;
-
-        themeBtn.addEventListener('click', () => {
-            isDark = !isDark;
-            const root = document.documentElement;
-            const icon = themeBtn.querySelector('i');
-
-            if (isDark) {
-                root.style.setProperty('--bg', '#0a1628');
-                root.style.setProperty('--white', '#1a2332');
-                root.style.setProperty('--dark', '#f1f5f9');
-                root.style.setProperty('--gray', '#94a3b8');
-                document.body.style.background = '#0a1628';
-                document.querySelector('.header').style.background = 'rgba(10, 22, 40, 0.95)';
-                icon.className = 'bi bi-sun';
-            } else {
-                root.style.setProperty('--bg', '#f8faff');
-                root.style.setProperty('--white', '#ffffff');
-                root.style.setProperty('--dark', '#0a1628');
-                root.style.setProperty('--gray', '#64748b');
-                document.body.style.background = '';
-                document.querySelector('.header').style.background = 'rgba(255, 255, 255, 0.92)';
-                icon.className = 'bi bi-moon';
-            }
-        });
-
-        // === Intersection Observer for animations ===
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.team-card, .story-container, .about-container').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(el);
-        });
-    </script>
-
+    document.addEventListener('click', function() {
+      lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
