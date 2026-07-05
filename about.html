@@ -58,11 +58,18 @@
       background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat;
     }
     
-    /* Sidebar */
+    /* Sidebar - Desktop */
     .sidebar {
       width: var(--sidebar-w);
       transition: width .25s ease, transform .25s ease;
       background: #071D17;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
     }
     .nav-item {
       transition: background .15s, color .15s;
@@ -130,6 +137,8 @@
         transform: translateX(-100%);
         box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
         width: 280px;
+        height: 100%;
+        overflow-y: auto;
       }
       html[dir="rtl"] .sidebar {
         transform: translateX(-100%);
@@ -341,8 +350,12 @@
       height: 1.1rem;
     }
     
-    /* === RESPONSIVE TABLET & MOBILE === */
-    /* Tablets (768px - 1024px) */
+    /* Table column visibility - desktop shows all */
+    .col-hide-md {
+      display: block;
+    }
+    
+    /* Tablet adjustments */
     @media (max-width: 1024px) and (min-width: 769px) {
       .sidebar {
         width: 220px;
@@ -374,93 +387,41 @@
       }
     }
     
-    /* Mobile (up to 768px) */
+    /* Mobile (up to 768px) - sidebar becomes off-canvas, table responsive */
     @media (max-width: 768px) {
-      /* Sidebar */
+      /* Sidebar becomes fixed */
       .sidebar {
         width: 280px;
+        position: fixed;
+        inset-block: 0;
+        inset-inline-start: 0;
+        z-index: 60;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
+        height: 100%;
+        overflow-y: auto;
+      }
+      html[dir="rtl"] .sidebar {
+        transform: translateX(-100%);
+      }
+      body.sb-open .sidebar {
+        transform: translateX(0);
+      }
+      body.sb-open .backdrop {
+        opacity: 1;
+        pointer-events: auto;
       }
       
-      /* Table grid - keep all columns but make them smaller */
+      /* Table grid for mobile */
       .row-grid {
-        grid-template-columns: 32px 1.2fr 1fr 0.8fr 32px !important;
+        grid-template-columns: 32px 1.2fr 0.8fr 32px !important;
         gap: 0.4rem !important;
         padding-inline: 0.5rem !important;
       }
       
-      /* Hide email/phone column on small tablets/phones */
-      @media (max-width: 640px) {
-        .row-grid {
-          grid-template-columns: 30px 1.2fr 0.6fr 30px !important;
-        }
-        .col-hide-md {
-          display: none !important;
-        }
-        /* Show only name, status, actions */
-        .row-grid .col-hide-md {
-          display: none !important;
-        }
-      }
-      
-      /* Very small phones */
-      @media (max-width: 480px) {
-        .row-grid {
-          grid-template-columns: 28px 1fr 28px !important;
-          gap: 0.3rem !important;
-          padding-inline: 0.4rem !important;
-        }
-        .table-row .flex.items-center.gap-2 {
-          gap: 0.3rem !important;
-        }
-        .table-row .avatar {
-          width: 26px !important;
-          height: 26px !important;
-          font-size: 10px !important;
-        }
-        .table-row .font-semibold {
-          font-size: 0.75rem !important;
-        }
-        .table-row .text-xs {
-          font-size: 0.55rem !important;
-        }
-        .badge-dot {
-          font-size: 8px !important;
-          padding: 0.15rem 0.4rem !important;
-        }
-        .badge-dot::before {
-          width: 4px;
-          height: 4px;
-          margin-inline-end: 3px;
-        }
-        .icon-btn {
-          width: 26px !important;
-          height: 26px !important;
-        }
-        .icon-btn i {
-          width: 0.9rem !important;
-          height: 0.9rem !important;
-        }
-        .page-btn {
-          width: 26px !important;
-          height: 26px !important;
-          font-size: 11px !important;
-        }
-        .page-btn i {
-          width: 0.9rem !important;
-          height: 0.9rem !important;
-        }
-        .menu-dropdown {
-          width: 9rem !important;
-          inset-inline-end: 2.2rem !important;
-        }
-        .menu-dropdown button {
-          font-size: 0.7rem !important;
-          padding: 0.3rem 0.5rem !important;
-        }
-        .menu-dropdown button i {
-          width: 0.8rem !important;
-          height: 0.8rem !important;
-        }
+      /* Hide email/phone column on mobile */
+      .col-hide-md {
+        display: none !important;
       }
       
       /* Table cells styling */
@@ -493,25 +454,98 @@
         height: 16px !important;
       }
       
-      /* Pagination */
-      .pagination-text {
-        font-size: 0.6rem !important;
+      /* Mobile search shows */
+      .mobile-search {
+        display: flex !important;
+      }
+      .desktop-search {
+        display: none !important;
       }
     }
     
-    /* Table column visibility */
-    .col-hide-md {
-      display: block;
-    }
-    @media (max-width: 900px) {
-      .col-hide-md {
-        display: none;
+    /* Very small phones */
+    @media (max-width: 480px) {
+      .row-grid {
+        grid-template-columns: 28px 1fr 28px !important;
+        gap: 0.3rem !important;
+        padding-inline: 0.4rem !important;
+      }
+      .table-row .flex.items-center.gap-2 {
+        gap: 0.3rem !important;
+      }
+      .table-row .avatar {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 10px !important;
+      }
+      .table-row .font-semibold {
+        font-size: 0.75rem !important;
+      }
+      .table-row .text-xs {
+        font-size: 0.55rem !important;
+      }
+      .badge-dot {
+        font-size: 8px !important;
+        padding: 0.1rem 0.4rem !important;
+      }
+      .badge-dot::before {
+        width: 4px;
+        height: 4px;
+        margin-inline-end: 3px;
+      }
+      .icon-btn {
+        width: 26px !important;
+        height: 26px !important;
+      }
+      .icon-btn i {
+        width: 0.9rem !important;
+        height: 0.9rem !important;
+      }
+      .page-btn {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 11px !important;
+      }
+      .page-btn i {
+        width: 0.9rem !important;
+        height: 0.9rem !important;
+      }
+      .menu-dropdown {
+        width: 9rem !important;
+        inset-inline-end: 2.2rem !important;
+      }
+      .menu-dropdown button {
+        font-size: 0.7rem !important;
+        padding: 0.3rem 0.5rem !important;
+      }
+      .menu-dropdown button i {
+        width: 0.8rem !important;
+        height: 0.8rem !important;
       }
     }
-    @media (max-width: 640px) {
-      .col-hide-sm {
-        display: none !important;
-      }
+    
+    /* Desktop search visible */
+    .desktop-search {
+      display: flex;
+    }
+    .mobile-search {
+      display: none;
+    }
+    
+    /* Pagination */
+    .pagination-text {
+      font-size: 0.6rem !important;
+    }
+    
+    .sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -519,6 +553,42 @@
 
   <!-- Main container with RTL direction -->
   <div class="min-h-screen flex" style="direction: rtl;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar shrink-0 text-slate-300 flex flex-col order-1" id="sidebar">
+      <div class="brand-row">
+        <div class="brand-icon">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="brand-text text-right">
+          <div class="brand-title">إدارة التعليم</div>
+          <div class="brand-sub">النظام الوطني</div>
+        </div>
+      </div>
+
+      <nav class="mt-1.5 px-2.5 space-y-0.5 flex-1">
+        <a href="#" class="nav-item"><i data-lucide="layout-grid"></i><span class="nav-label">لوحة التحكم</span></a>
+        <a href="#" class="nav-item"><i data-lucide="book-open"></i><span class="nav-label">الدورات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="library"></i><span class="nav-label">المكتبة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="rss"></i><span class="nav-label">المدونة</span></a>
+        <a href="#" class="nav-item active"><i data-lucide="users"></i><span class="nav-label">الطلاب</span></a>
+        <a href="#" class="nav-item"><i data-lucide="message-square"></i><span class="nav-label">المحادثة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="file-text"></i><span class="nav-label">الصفحات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="settings"></i><span class="nav-label">الإعدادات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="shield-check"></i><span class="nav-label">الصلاحيات</span></a>
+      </nav>
+
+      <div class="p-3 space-y-1.5">
+        <button class="cta-btn">
+          <i data-lucide="plus"></i>
+          <span class="cta-label">إضافة دورة جديدة</span>
+        </button>
+        <a href="#" class="nav-item"><i data-lucide="log-out"></i><span class="logout-label">تسجيل الخروج</span></a>
+      </div>
+    </aside>
+
+    <!-- Backdrop for mobile -->
+    <div class="backdrop" id="sb-backdrop"></div>
 
     <!-- Main content -->
     <main class="flex-1 min-w-0 order-2">
@@ -529,7 +599,8 @@
           <h1 class="text-base md:text-lg font-bold text-slate-900">الطلاب</h1>
         </div>
 
-        <div class="mx-auto hidden md:flex items-center gap-2">
+        <!-- Desktop Search -->
+        <div class="desktop-search mx-auto items-center gap-2">
           <div class="relative">
             <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-3 text-slate-400"></i>
             <input type="text" placeholder="بحث عن طالب..."
@@ -548,6 +619,7 @@
           </button>
           <img class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover ring-2 ring-white shadow" src="https://i.pravatar.cc/80?img=47" alt="User">
 
+          <!-- Mobile sidebar toggle (3 lines) -->
           <button id="sb-toggle" aria-label="Toggle sidebar" class="icon-btn border border-slate-200 bg-white">
             <i data-lucide="panel-right" class="w-4 h-4 only-desktop"></i>
             <i data-lucide="menu" class="w-4 h-4 only-mobile"></i>
@@ -556,7 +628,7 @@
       </header>
 
       <!-- Mobile search row -->
-      <div class="md:hidden px-3 pb-2 flex items-center gap-2">
+      <div class="mobile-search md:hidden px-3 pb-2 flex items-center gap-2">
         <div class="relative flex-1">
           <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-2.5 text-slate-400"></i>
           <input type="text" placeholder="بحث عن طالب..."
@@ -753,42 +825,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Backdrop for mobile -->
-    <div class="backdrop" id="sb-backdrop"></div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar shrink-0 text-slate-300 flex flex-col order-1" id="sidebar">
-      <div class="brand-row">
-        <div class="brand-icon">
-          <i data-lucide="graduation-cap"></i>
-        </div>
-        <div class="brand-text text-right">
-          <div class="brand-title">إدارة التعليم</div>
-          <div class="brand-sub">النظام الوطني</div>
-        </div>
-      </div>
-
-      <nav class="mt-1.5 px-2.5 space-y-0.5 flex-1">
-        <a href="#" class="nav-item"><i data-lucide="layout-grid"></i><span class="nav-label">لوحة التحكم</span></a>
-        <a href="#" class="nav-item"><i data-lucide="book-open"></i><span class="nav-label">الدورات</span></a>
-        <a href="#" class="nav-item"><i data-lucide="library"></i><span class="nav-label">المكتبة</span></a>
-        <a href="#" class="nav-item"><i data-lucide="rss"></i><span class="nav-label">المدونة</span></a>
-        <a href="#" class="nav-item active"><i data-lucide="users"></i><span class="nav-label">الطلاب</span></a>
-        <a href="#" class="nav-item"><i data-lucide="message-square"></i><span class="nav-label">المحادثة</span></a>
-        <a href="#" class="nav-item"><i data-lucide="file-text"></i><span class="nav-label">الصفحات</span></a>
-        <a href="#" class="nav-item"><i data-lucide="settings"></i><span class="nav-label">الإعدادات</span></a>
-        <a href="#" class="nav-item"><i data-lucide="shield-check"></i><span class="nav-label">الصلاحيات</span></a>
-      </nav>
-
-      <div class="p-3 space-y-1.5">
-        <button class="cta-btn">
-          <i data-lucide="plus"></i>
-          <span class="cta-label">إضافة دورة جديدة</span>
-        </button>
-        <a href="#" class="nav-item"><i data-lucide="log-out"></i><span class="logout-label">تسجيل الخروج</span></a>
-      </div>
-    </aside>
   </div>
 
   <!-- JavaScript -->
