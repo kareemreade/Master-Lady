@@ -127,7 +127,7 @@
       padding: 0.6rem;
     }
     
-    /* Mobile sidebar (off-canvas) */
+    /* Mobile sidebar (off-canvas) - hidden by default, shown when sb-open class is added */
     @media (max-width: 768px) {
       .sidebar {
         position: fixed;
@@ -139,6 +139,7 @@
         width: 280px;
         height: 100%;
         overflow-y: auto;
+        transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
       }
       html[dir="rtl"] .sidebar {
         transform: translateX(-100%);
@@ -150,6 +151,16 @@
         opacity: 1;
         pointer-events: auto;
       }
+      
+      /* Show mobile toggle button (3 lines) */
+      .mobile-toggle {
+        display: inline-flex !important;
+      }
+    }
+    
+    /* Hide mobile toggle on desktop */
+    .mobile-toggle {
+      display: none;
     }
     
     /* Backdrop */
@@ -387,19 +398,20 @@
       }
     }
     
-    /* Mobile (up to 768px) - sidebar becomes off-canvas, table responsive */
+    /* Mobile (up to 768px) - sidebar becomes off-canvas, hidden by default */
     @media (max-width: 768px) {
-      /* Sidebar becomes fixed */
+      /* Sidebar becomes fixed and hidden */
       .sidebar {
-        width: 280px;
         position: fixed;
         inset-block: 0;
         inset-inline-start: 0;
         z-index: 60;
         transform: translateX(-100%);
         box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
+        width: 280px;
         height: 100%;
         overflow-y: auto;
+        transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
       }
       html[dir="rtl"] .sidebar {
         transform: translateX(-100%);
@@ -410,6 +422,11 @@
       body.sb-open .backdrop {
         opacity: 1;
         pointer-events: auto;
+      }
+      
+      /* Show mobile toggle button (3 lines) */
+      .mobile-toggle {
+        display: inline-flex !important;
       }
       
       /* Table grid for mobile */
@@ -619,10 +636,9 @@
           </button>
           <img class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover ring-2 ring-white shadow" src="https://i.pravatar.cc/80?img=47" alt="User">
 
-          <!-- Mobile sidebar toggle (3 lines) -->
-          <button id="sb-toggle" aria-label="Toggle sidebar" class="icon-btn border border-slate-200 bg-white">
-            <i data-lucide="panel-right" class="w-4 h-4 only-desktop"></i>
-            <i data-lucide="menu" class="w-4 h-4 only-mobile"></i>
+          <!-- Mobile sidebar toggle (3 lines) - only visible on mobile -->
+          <button id="sb-toggle" aria-label="Toggle sidebar" class="icon-btn border border-slate-200 bg-white mobile-toggle">
+            <i data-lucide="menu" class="w-4 h-4"></i>
           </button>
         </div>
       </header>
@@ -838,32 +854,47 @@
     const backdrop = document.getElementById('sb-backdrop');
     const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
+    // Desktop collapsed state
     if (localStorage.getItem('sb-collapsed') === '1') {
       body.classList.add('sb-collapsed');
     }
 
     toggle.addEventListener('click', () => {
       if (isMobile()) {
+        // On mobile: toggle sidebar open/close
         body.classList.toggle('sb-open');
+        // Prevent body scroll when sidebar is open
+        if (body.classList.contains('sb-open')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
       } else {
+        // On desktop: toggle collapsed state
         body.classList.toggle('sb-collapsed');
         localStorage.setItem('sb-collapsed', body.classList.contains('sb-collapsed') ? '1' : '0');
       }
     });
 
+    // Close sidebar when clicking backdrop
     backdrop.addEventListener('click', () => {
       body.classList.remove('sb-open');
+      document.body.style.overflow = '';
     });
 
-    window.addEventListener('resize', () => {
-      if (!isMobile()) {
-        body.classList.remove('sb-open');
-      }
-    });
-
+    // Close sidebar on escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         body.classList.remove('sb-open');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Close sidebar when resizing to desktop
+    window.addEventListener('resize', () => {
+      if (!isMobile()) {
+        body.classList.remove('sb-open');
+        document.body.style.overflow = '';
       }
     });
 
