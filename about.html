@@ -1,370 +1,900 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>إدارة الطلاب — النظام الوطني</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>
-        tailwind.config = {
-          theme: {
-            extend: {
-              fontFamily: { sans: ['Cairo','system-ui','sans-serif'] },
-              colors: {
-                brand: {
-                  50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',300:'#6ee7b7',400:'#34d399',
-                  500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b',950:'#022c22',
-                },
-                panel: '#0f1a24',
-              },
-              boxShadow: {
-                card: '0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06)',
-                pop:  '0 10px 30px -10px rgba(16,24,40,.15)',
-              }
-            }
-          }
-        }
-</script>
-<style>
-          :root{
-            --sidebar-w: 280px;
-            --sidebar-w-icon: 76px;
-          }
-          html,body{background:#f6f7f9;}
-          .table-row + .table-row { border-top: 1px solid #eef0f3; }
-          .chk{ appearance:none; width:20px; height:20px; border:1.5px solid #d5d9e0; border-radius:6px; display:inline-grid; place-items:center; background:#fff; cursor:pointer; transition:all .15s;}
-          .chk:checked{ background:#059669; border-color:#059669;}
-          .chk:checked::after{ content:''; width:10px; height:10px; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat;}
-
-          /* Sidebar */
-          .sidebar{
-            width: var(--sidebar-w);
-            transition: width .25s ease, transform .25s ease;
-          }
-          .nav-item{ transition: background .15s, color .15s; }
-          .nav-item:hover{ background: rgba(255,255,255,.04); }
-          .nav-item.active{ background:#fff; color:#0b1220; }
-          .nav-label, .brand-text, .cta-label, .logout-label{ transition: opacity .15s ease; white-space:nowrap; }
-
-          /* Collapsed (desktop) */
-          body.sb-collapsed .sidebar{ width: var(--sidebar-w-icon); }
-          body.sb-collapsed .nav-item{ justify-content:center; padding-inline: 0.5rem; }
-          body.sb-collapsed .nav-label,
-          body.sb-collapsed .brand-text,
-          body.sb-collapsed .cta-label,
-          body.sb-collapsed .logout-label{ opacity:0; width:0; overflow:hidden; }
-          body.sb-collapsed .brand-row{ justify-content:center; }
-          body.sb-collapsed .cta-btn{ padding: 0.75rem; }
-
-          /* Mobile: sidebar becomes off-canvas from the right */
-          @media (max-width: 768px){
-            .sidebar{
-              position: fixed; inset-block: 0; inset-inline-end: 0;
-              z-index: 60;
-              transform: translateX(100%); /* RTL: hidden to the right */
-              box-shadow: -10px 0 30px -10px rgba(0,0,0,.4);
-            }
-            html[dir="rtl"] .sidebar{ transform: translateX(100%); }
-            body.sb-open .sidebar{ transform: translateX(0); }
-            body.sb-open .backdrop{ opacity:1; pointer-events:auto; }
-          }
-          .backdrop{
-            position: fixed; inset:0; background: rgba(15,26,36,.5); z-index: 50;
-            opacity:0; pointer-events:none; transition: opacity .2s ease;
-          }
-
-          .badge-dot::before{ content:''; width:6px; height:6px; border-radius:9999px; background:currentColor; display:inline-block; margin-inline-end:6px; vertical-align:middle;}
-          .menu{ animation: pop .12s ease-out; transform-origin: top right;}
-          @keyframes pop { from{opacity:0; transform: scale(.96);} to{opacity:1; transform: scale(1);} }
-          .page-btn{ width:36px; height:36px; display:inline-grid; place-items:center; border-radius:8px; font-size:14px; color:#475467;}
-          .page-btn:hover{ background:#f2f4f7;}
-          .page-btn.active{ background:#059669; color:#fff;}
-          .icon-btn{ width:36px; height:36px; display:inline-grid; place-items:center; border-radius:10px; color:#475467;}
-          .icon-btn:hover{ background:#f2f4f7;}
-          .avatar{ width:36px; height:36px; border-radius:9999px; display:inline-grid; place-items:center; font-weight:600; color:#fff; font-size:14px;}
-
-          /* Hide the desktop collapse icon on small screens, and the mobile hamburger on desktop */
-          .only-desktop{ display:inline-grid; }
-          .only-mobile{ display:none; }
-          @media (max-width: 768px){
-            .only-desktop{ display:none; }
-            .only-mobile{ display:inline-grid; }
-          }
-
-          /* Hide some table columns on small screens to keep it readable */
-          @media (max-width: 900px){
-            .col-hide-md{ display:none; }
-            .row-grid{ grid-template-columns: 40px 1.4fr 1fr 0.9fr 44px !important; }
-          }
-</style>
-</head>
-<body class="font-sans text-[15px] text-slate-800">
-
-<div class="min-h-screen flex">
-
-  <!-- Main -->
-  <main class="flex-1 min-w-0">
-    <!-- Top bar -->
-    <header class="flex items-center gap-3 md:gap-4 px-4 md:px-8 py-4 md:py-5">
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-3 py-1 text-sm font-semibold">248 طالب</span>
-        <h1 class="text-lg font-bold text-slate-900">الطلاب</h1>
-      </div>
-
-      <div class="mx-auto hidden md:flex items-center gap-3">
-        <div class="relative">
-          <i data-lucide="search" class="w-4 h-4 absolute top-1/2 -translate-y-1/2 start-3 text-slate-400"></i>
-          <input type="text" placeholder="بحث عن طالب..."
-            class="w-[360px] rounded-xl border border-slate-200 bg-white ps-10 pe-4 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500">
-        </div>
-        <button class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
-          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-          تصفية
-        </button>
-      </div>
-
-      <div class="ms-auto flex items-center gap-2 md:gap-3">
-        <button class="icon-btn relative">
-          <i data-lucide="bell" class="w-5 h-5"></i>
-          <span class="absolute top-2 end-2 w-2 h-2 rounded-full bg-rose-500"></span>
-        </button>
-        <img class="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow"
-             src="https://i.pravatar.cc/80?img=47" alt="User">
-
-        <!-- Sidebar toggle -->
-        <button id="sb-toggle" aria-label="Toggle sidebar"
-          class="icon-btn border border-slate-200 bg-white">
-          <i data-lucide="panel-right" class="w-5 h-5 only-desktop"></i>
-          <i data-lucide="menu" class="w-5 h-5 only-mobile"></i>
-        </button>
-      </div>
-    </header>
-
-    <!-- Mobile search row -->
-    <div class="md:hidden px-4 pb-3 flex items-center gap-2">
-      <div class="relative flex-1">
-        <i data-lucide="search" class="w-4 h-4 absolute top-1/2 -translate-y-1/2 start-3 text-slate-400"></i>
-        <input type="text" placeholder="بحث عن طالب..."
-          class="w-full rounded-xl border border-slate-200 bg-white ps-10 pe-4 py-2.5 text-sm">
-      </div>
-      <button class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm">
-        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-      </button>
-    </div>
-
-    <!-- Content -->
-    <div class="px-4 md:px-8 pb-10">
-
-      <!-- Selection bar -->
-      <div class="rounded-2xl bg-slate-900 text-white px-4 py-3 flex flex-wrap items-center gap-3 md:gap-4 shadow-card">
-        <span class="inline-grid place-items-center w-7 h-7 rounded-full bg-brand-500">
-          <i data-lucide="check" class="w-4 h-4"></i>
-        </span>
-        <span class="text-sm font-medium">3 طلاب محددين</span>
-
-        <div class="ms-auto flex items-center gap-2 md:gap-3">
-          <button class="inline-flex items-center gap-2 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30 px-3 py-2 text-sm font-medium hover:bg-rose-500/25">
-            <i data-lucide="ban" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">تعطيل الحسابات</span>
-          </button>
-          <button class="inline-flex items-center gap-2 rounded-lg bg-white text-slate-900 px-3 py-2 text-sm font-medium hover:bg-slate-100">
-            <i data-lucide="mail" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">إرسال إشعار</span>
-          </button>
-          <button class="icon-btn text-slate-300 hover:bg-white/10"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-      </div>
-
-      <!-- Table card -->
-      <div class="mt-5 rounded-2xl bg-white shadow-card border border-slate-100 overflow-visible">
-        <!-- Header row -->
-        <div class="row-grid grid grid-cols-[56px_1.6fr_1.6fr_1fr_1fr_0.9fr_60px] items-center gap-4 px-4 md:px-6 py-4 text-sm text-slate-500 border-b border-slate-100">
-          <div><input type="checkbox" class="chk" checked></div>
-          <div class="font-medium text-slate-600">الاسم</div>
-          <div class="font-medium text-slate-600 col-hide-md">البريد/الهاتف</div>
-          <div class="font-medium text-slate-600 col-hide-md">المرحلة</div>
-          <div class="font-medium text-slate-600 col-hide-md">تاريخ التسجيل</div>
-          <div class="font-medium text-slate-600 flex items-center gap-1">الحالة <i data-lucide="chevron-down" class="w-4 h-4"></i></div>
-          <div class="font-medium text-slate-600">الإجراءات</div>
-        </div>
-
-        <!-- Row 1 -->
-        <div class="table-row row-grid grid grid-cols-[56px_1.6fr_1.6fr_1fr_1fr_0.9fr_60px] items-center gap-4 px-4 md:px-6 py-4">
-          <div><input type="checkbox" class="chk" checked></div>
-          <div class="flex items-center gap-3">
-            <span class="avatar bg-amber-400">أ</span>
-            <div>
-              <div class="font-semibold text-slate-900">أحمد محمود خليل</div>
-              <div class="text-xs text-slate-400">معرّف: #STD-8821</div>
-            </div>
-          </div>
-          <div class="col-hide-md"><div class="text-slate-700">ahmed.m@example.ps</div><div class="text-xs text-slate-400">+970 599 123 456</div></div>
-          <div class="col-hide-md text-slate-700">الثانوية العامة</div>
-          <div class="col-hide-md text-slate-700">12 أكتوبر 2023</div>
-          <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2.5 py-1 text-xs font-semibold">نشط</span></div>
-          <div><button class="icon-btn"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></div>
-        </div>
-
-        <!-- Row 2 -->
-        <div class="table-row row-grid relative grid grid-cols-[56px_1.6fr_1.6fr_1fr_1fr_0.9fr_60px] items-center gap-4 px-4 md:px-6 py-4">
-          <div><input type="checkbox" class="chk" checked></div>
-          <div class="flex items-center gap-3">
-            <span class="avatar bg-sky-400">س</span>
-            <div>
-              <div class="font-semibold text-slate-900">سارة عبد الرحمن</div>
-              <div class="text-xs text-slate-400">معرّف: #STD-9012</div>
-            </div>
-          </div>
-          <div class="col-hide-md"><div class="text-slate-700">sara.a@example.ps</div><div class="text-xs text-slate-400">+970 568 987 654</div></div>
-          <div class="col-hide-md text-slate-700">المرحلة الإعدادية</div>
-          <div class="col-hide-md text-slate-700">15 نوفمبر 2023</div>
-          <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2.5 py-1 text-xs font-semibold">نشط</span></div>
-          <div class="relative">
-            <button class="icon-btn"><i data-lucide="more-vertical" class="w-4 h-4"></i></button>
-            <div class="menu absolute top-10 end-0 z-20 w-48 rounded-xl bg-white shadow-pop border border-slate-100 p-1.5 text-sm">
-              <button class="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"><i data-lucide="eye" class="w-4 h-4"></i> عرض الملف</button>
-              <button class="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-50"><i data-lucide="send" class="w-4 h-4"></i> إرسال إشعار</button>
-              <button class="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-rose-600 hover:bg-rose-50"><i data-lucide="ban" class="w-4 h-4"></i> تعطيل الحساب</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 3 -->
-        <div class="table-row row-grid grid grid-cols-[56px_1.6fr_1.6fr_1fr_1fr_0.9fr_60px] items-center gap-4 px-4 md:px-6 py-4">
-          <div><input type="checkbox" class="chk" checked></div>
-          <div class="flex items-center gap-3">
-            <span class="avatar bg-violet-400">م</span>
-            <div>
-              <div class="font-semibold text-slate-900">محمد يوسف العلي</div>
-              <div class="text-xs text-slate-400">معرّف: #STD-7762</div>
-            </div>
-          </div>
-          <div class="col-hide-md"><div class="text-slate-700">m.ali@example.ps</div><div class="text-xs text-slate-400">+970 592 555 000</div></div>
-          <div class="col-hide-md text-slate-700">المرحلة الابتدائية</div>
-          <div class="col-hide-md text-slate-700">05 سبتمبر 2023</div>
-          <div><span class="badge-dot inline-flex items-center rounded-full bg-slate-100 text-slate-500 px-2.5 py-1 text-xs font-semibold">معطل</span></div>
-          <div><button class="icon-btn"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></div>
-        </div>
-
-        <!-- Row 4 -->
-        <div class="table-row row-grid grid grid-cols-[56px_1.6fr_1.6fr_1fr_1fr_0.9fr_60px] items-center gap-4 px-4 md:px-6 py-4">
-          <div><input type="checkbox" class="chk"></div>
-          <div class="flex items-center gap-3">
-            <span class="avatar bg-rose-400">ل</span>
-            <div>
-              <div class="font-semibold text-slate-900">ليلى إبراهيم جابر</div>
-              <div class="text-xs text-slate-400">معرّف: #STD-4412</div>
-            </div>
-          </div>
-          <div class="col-hide-md"><div class="text-slate-700">laila.j@example.ps</div><div class="text-xs text-slate-400">+970 597 111 222</div></div>
-          <div class="col-hide-md text-slate-700">الثانوية العامة</div>
-          <div class="col-hide-md text-slate-700">20 ديسمبر 2023</div>
-          <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2.5 py-1 text-xs font-semibold">نشط</span></div>
-          <div><button class="icon-btn"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></div>
-        </div>
-
-        <!-- Row 5 -->
-        <div class="table-row row-grid grid grid-cols-[56px_1.6fr_1.6fr_1fr_1fr_0.9fr_60px] items-center gap-4 px-4 md:px-6 py-4">
-          <div><input type="checkbox" class="chk"></div>
-          <div class="flex items-center gap-3">
-            <span class="avatar bg-emerald-400">خ</span>
-            <div>
-              <div class="font-semibold text-slate-900">خالد منصور</div>
-              <div class="text-xs text-slate-400">معرّف: #STD-3398</div>
-            </div>
-          </div>
-          <div class="col-hide-md"><div class="text-slate-700">khaled.m@example.ps</div><div class="text-xs text-slate-400">+970 594 333 444</div></div>
-          <div class="col-hide-md text-slate-700">المرحلة الإعدادية</div>
-          <div class="col-hide-md text-slate-700">01 يناير 2024</div>
-          <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2.5 py-1 text-xs font-semibold">نشط</span></div>
-          <div><button class="icon-btn"><i data-lucide="more-vertical" class="w-4 h-4"></i></button></div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="flex flex-wrap items-center gap-4 px-4 md:px-6 py-4 border-t border-slate-100 text-sm text-slate-500">
-          <div class="flex items-center gap-2">
-            <span>الصفوف لكل صفحة:</span>
-            <button class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5">10 <i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-          </div>
-          <div class="hidden sm:block">عرض 1-10 من 248</div>
-          <div class="ms-auto flex items-center gap-1">
-            <button class="page-btn"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-            <button class="page-btn">25</button>
-            <span class="page-btn">…</span>
-            <button class="page-btn">3</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Backdrop for mobile -->
-  <div class="backdrop" id="sb-backdrop"></div>
-
-  <!-- Sidebar -->
-  <aside class="sidebar shrink-0 bg-panel text-slate-300 flex flex-col" id="sidebar">
-    <div class="brand-row flex items-center gap-3 px-4 py-5">
-      <div class="w-10 h-10 rounded-xl bg-brand-600 grid place-items-center shadow-lg shrink-0">
-        <i data-lucide="graduation-cap" class="w-5 h-5 text-white"></i>
-      </div>
-      <div class="brand-text text-right leading-tight">
-        <div class="text-white font-bold">إدارة التعليم</div>
-        <div class="text-xs text-slate-400">النظام الوطني</div>
-      </div>
-    </div>
-
-    <nav class="mt-2 px-3 space-y-1 flex-1">
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="لوحة التحكم"><i data-lucide="layout-grid" class="w-5 h-5 shrink-0"></i><span class="nav-label">لوحة التحكم</span></a>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="الدورات"><i data-lucide="book-open" class="w-5 h-5 shrink-0"></i><span class="nav-label">الدورات</span></a>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="المكتبة"><i data-lucide="library" class="w-5 h-5 shrink-0"></i><span class="nav-label">المكتبة</span></a>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="المدونة"><i data-lucide="rss" class="w-5 h-5 shrink-0"></i><span class="nav-label">المدونة</span></a>
-      <a href="#" class="nav-item active flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold" title="الطلاب"><i data-lucide="users" class="w-5 h-5 shrink-0"></i><span class="nav-label">الطلاب</span></a>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="المحادثة"><i data-lucide="message-square" class="w-5 h-5 shrink-0"></i><span class="nav-label">المحادثة</span></a>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="الصفحات"><i data-lucide="file-text" class="w-5 h-5 shrink-0"></i><span class="nav-label">الصفحات</span></a>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="الإعدادات"><i data-lucide="settings" class="w-5 h-5 shrink-0"></i><span class="nav-label">الإعدادات</span></a>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="الصلاحيات"><i data-lucide="shield-check" class="w-5 h-5 shrink-0"></i><span class="nav-label">الصلاحيات</span></a>
-    </nav>
-
-    <div class="p-4 space-y-2">
-      <button class="cta-btn w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-900 font-semibold px-4 py-3 shadow-lg shadow-brand-500/20" title="إضافة دورة جديدة">
-        <i data-lucide="plus" class="w-5 h-5 shrink-0"></i>
-        <span class="cta-label">إضافة دورة جديدة</span>
-      </button>
-      <a href="#" class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm" title="تسجيل الخروج">
-        <i data-lucide="log-out" class="w-5 h-5 shrink-0"></i><span class="logout-label">تسجيل الخروج</span>
-      </a>
-    </div>
-  </aside>
-</div>
-
-<script>
-  lucide.createIcons();
-
-  const body = document.body;
-  const toggle = document.getElementById('sb-toggle');
-  const backdrop = document.getElementById('sb-backdrop');
-  const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
-
-  // Restore desktop collapsed state
-  if (localStorage.getItem('sb-collapsed') === '1') body.classList.add('sb-collapsed');
-
-  toggle.addEventListener('click', () => {
-    if (isMobile()) {
-      body.classList.toggle('sb-open');
-    } else {
-      body.classList.toggle('sb-collapsed');
-      localStorage.setItem('sb-collapsed', body.classList.contains('sb-collapsed') ? '1' : '0');
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إدارة الطلاب — النظام الوطني</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest">
+  </script>
+  
+  <!-- Google Font: Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS (separate from Tailwind) -->
+  <style>
+    /* ----- CSS Variables & Reset ----- */
+    :root {
+      --sidebar-w: 260px;
+      --sidebar-w-icon: 68px;
     }
-  });
+    html, body {
+      background: #f6f7f9;
+      font-family: 'Cairo', system-ui, sans-serif;
+    }
+    
+    /* ----- Custom Components ----- */
+    .table-row + .table-row {
+      border-top: 1px solid #eef0f3;
+    }
+    
+    /* Custom Checkbox */
+    .chk {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid #d5d9e0;
+      border-radius: 5px;
+      display: inline-grid;
+      place-items: center;
+      background: #fff;
+      cursor: pointer;
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .chk:checked {
+      background: #059669;
+      border-color: #059669;
+    }
+    .chk:checked::after {
+      content: '';
+      width: 9px;
+      height: 9px;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat;
+    }
+    
+    /* Sidebar - Desktop */
+    .sidebar {
+      width: var(--sidebar-w);
+      transition: width .25s ease, transform .25s ease;
+      background: #071D17;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+    }
+    .nav-item {
+      transition: background .15s, color .15s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-radius: 0.6rem;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .04);
+    }
+    .nav-item.active {
+      background: #fff;
+      color: #0b1220;
+      font-weight: 600;
+    }
+    .nav-label,
+    .brand-text,
+    .cta-label,
+    .logout-label {
+      transition: opacity .15s ease;
+      white-space: nowrap;
+    }
+    .nav-item i {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+    }
+    
+    /* Collapsed state (desktop) */
+    body.sb-collapsed .sidebar {
+      width: var(--sidebar-w-icon);
+    }
+    body.sb-collapsed .nav-item {
+      justify-content: center;
+      padding-inline: 0.4rem;
+    }
+    body.sb-collapsed .nav-label,
+    body.sb-collapsed .brand-text,
+    body.sb-collapsed .cta-label,
+    body.sb-collapsed .logout-label {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+    body.sb-collapsed .brand-row {
+      justify-content: center;
+    }
+    body.sb-collapsed .cta-btn {
+      padding: 0.6rem;
+    }
+    
+    /* Mobile sidebar (off-canvas) */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        inset-block: 0;
+        inset-inline-start: 0;
+        z-index: 60;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
+        width: 280px;
+        height: 100%;
+        overflow-y: auto;
+      }
+      html[dir="rtl"] .sidebar {
+        transform: translateX(-100%);
+      }
+      body.sb-open .sidebar {
+        transform: translateX(0);
+      }
+      body.sb-open .backdrop {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+    
+    /* Backdrop */
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 26, 36, .5);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    
+    /* Badge with dot */
+    .badge-dot::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 9999px;
+      background: currentColor;
+      display: inline-block;
+      margin-inline-end: 5px;
+      vertical-align: middle;
+    }
+    
+    /* Dropdown menu */
+    .menu-dropdown {
+      display: none;
+      animation: pop .12s ease-out;
+      transform-origin: top center;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      inset-inline-end: 2.8rem;
+      z-index: 20;
+      width: 11rem;
+      border-radius: 0.6rem;
+      background: #fff;
+      box-shadow: 0 10px 30px -10px rgba(16,24,40,.15);
+      border: 1px solid #f1f5f9;
+      padding: 0.3rem;
+    }
+    .menu-dropdown.show {
+      display: block;
+    }
+    .menu-dropdown button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-radius: 0.4rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      color: #334155;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .menu-dropdown button:hover {
+      background: #f8fafc;
+    }
+    .menu-dropdown button i {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+    .menu-dropdown .text-rose-600 {
+      color: #e11d48;
+    }
+    .menu-dropdown .text-rose-600:hover {
+      background: #fff1f2;
+    }
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(-50%) scale(.96); }
+      to { opacity: 1; transform: translateY(-50%) scale(1); }
+    }
+    
+    /* Page buttons */
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #475467;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .page-btn:hover {
+      background: #f2f4f7;
+    }
+    .page-btn.active {
+      background: #059669;
+      color: #fff;
+    }
+    
+    /* Icon button */
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #475467;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      background: #f2f4f7;
+    }
+    .icon-btn i {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+    
+    /* Avatar */
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 600;
+      color: #fff;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    
+    /* Responsive helpers */
+    .only-desktop { display: inline-grid; }
+    .only-mobile { display: none; }
+    @media (max-width: 768px) {
+      .only-desktop { display: none; }
+      .only-mobile { display: inline-grid; }
+    }
+    
+    /* Brand row */
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1rem 0.8rem;
+    }
+    .brand-row .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 0.6rem;
+      background: #059669;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .brand-row .brand-icon i {
+      width: 1.1rem;
+      height: 1.1rem;
+      color: #fff;
+    }
+    .brand-text .brand-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .brand-text .brand-sub {
+      color: #94a3b8;
+      font-size: 0.65rem;
+    }
+    
+    /* CTA button */
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+      border-radius: 0.6rem;
+      background: #10b981;
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+      box-shadow: 0 8px 20px -8px rgba(16, 185, 129, 0.3);
+    }
+    .cta-btn:hover {
+      background: #34d399;
+    }
+    .cta-btn i {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+    
+    /* Table column visibility - desktop shows all */
+    .col-hide-md {
+      display: block;
+    }
+    
+    /* Tablet adjustments */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .sidebar {
+        width: 220px;
+      }
+      body.sb-collapsed .sidebar {
+        width: 60px;
+      }
+      .row-grid {
+        grid-template-columns: 36px 1.2fr 1fr 0.8fr 36px !important;
+        gap: 0.6rem !important;
+        padding-inline: 0.8rem !important;
+      }
+      .table-row .font-semibold {
+        font-size: 0.85rem;
+      }
+      .table-row .text-xs {
+        font-size: 0.7rem;
+      }
+      .table-row .avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+      }
+      .brand-text .brand-title {
+        font-size: 0.85rem;
+      }
+      .brand-text .brand-sub {
+        font-size: 0.6rem;
+      }
+    }
+    
+    /* Mobile (up to 768px) - sidebar becomes off-canvas, table responsive */
+    @media (max-width: 768px) {
+      /* Sidebar becomes fixed */
+      .sidebar {
+        width: 280px;
+        position: fixed;
+        inset-block: 0;
+        inset-inline-start: 0;
+        z-index: 60;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
+        height: 100%;
+        overflow-y: auto;
+      }
+      html[dir="rtl"] .sidebar {
+        transform: translateX(-100%);
+      }
+      body.sb-open .sidebar {
+        transform: translateX(0);
+      }
+      body.sb-open .backdrop {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      
+      /* Table grid for mobile */
+      .row-grid {
+        grid-template-columns: 32px 1.2fr 0.8fr 32px !important;
+        gap: 0.4rem !important;
+        padding-inline: 0.5rem !important;
+      }
+      
+      /* Hide email/phone column on mobile */
+      .col-hide-md {
+        display: none !important;
+      }
+      
+      /* Table cells styling */
+      .table-row {
+        padding-block: 0.5rem !important;
+      }
+      .table-row .font-semibold {
+        font-size: 0.8rem;
+        line-height: 1.2;
+      }
+      .table-row .text-xs {
+        font-size: 0.6rem;
+      }
+      .table-row .avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+      .badge-dot {
+        font-size: 9px !important;
+        padding: 0.15rem 0.5rem !important;
+      }
+      
+      /* Header row */
+      .row-grid .font-medium {
+        font-size: 0.65rem !important;
+      }
+      .row-grid .chk {
+        width: 16px !important;
+        height: 16px !important;
+      }
+      
+      /* Mobile search shows */
+      .mobile-search {
+        display: flex !important;
+      }
+      .desktop-search {
+        display: none !important;
+      }
+    }
+    
+    /* Very small phones */
+    @media (max-width: 480px) {
+      .row-grid {
+        grid-template-columns: 28px 1fr 28px !important;
+        gap: 0.3rem !important;
+        padding-inline: 0.4rem !important;
+      }
+      .table-row .flex.items-center.gap-2 {
+        gap: 0.3rem !important;
+      }
+      .table-row .avatar {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 10px !important;
+      }
+      .table-row .font-semibold {
+        font-size: 0.75rem !important;
+      }
+      .table-row .text-xs {
+        font-size: 0.55rem !important;
+      }
+      .badge-dot {
+        font-size: 8px !important;
+        padding: 0.1rem 0.4rem !important;
+      }
+      .badge-dot::before {
+        width: 4px;
+        height: 4px;
+        margin-inline-end: 3px;
+      }
+      .icon-btn {
+        width: 26px !important;
+        height: 26px !important;
+      }
+      .icon-btn i {
+        width: 0.9rem !important;
+        height: 0.9rem !important;
+      }
+      .page-btn {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 11px !important;
+      }
+      .page-btn i {
+        width: 0.9rem !important;
+        height: 0.9rem !important;
+      }
+      .menu-dropdown {
+        width: 9rem !important;
+        inset-inline-end: 2.2rem !important;
+      }
+      .menu-dropdown button {
+        font-size: 0.7rem !important;
+        padding: 0.3rem 0.5rem !important;
+      }
+      .menu-dropdown button i {
+        width: 0.8rem !important;
+        height: 0.8rem !important;
+      }
+    }
+    
+    /* Desktop search visible */
+    .desktop-search {
+      display: flex;
+    }
+    .mobile-search {
+      display: none;
+    }
+    
+    /* Pagination */
+    .pagination-text {
+      font-size: 0.6rem !important;
+    }
+    
+    .sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="text-[14px] text-slate-800">
 
-  backdrop.addEventListener('click', () => body.classList.remove('sb-open'));
-  window.addEventListener('resize', () => { if (!isMobile()) body.classList.remove('sb-open'); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') body.classList.remove('sb-open'); });
-</script>
+  <!-- Main container with RTL direction -->
+  <div class="min-h-screen flex" style="direction: rtl;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar shrink-0 text-slate-300 flex flex-col order-1" id="sidebar">
+      <div class="brand-row">
+        <div class="brand-icon">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="brand-text text-right">
+          <div class="brand-title">إدارة التعليم</div>
+          <div class="brand-sub">النظام الوطني</div>
+        </div>
+      </div>
+
+      <nav class="mt-1.5 px-2.5 space-y-0.5 flex-1">
+        <a href="#" class="nav-item"><i data-lucide="layout-grid"></i><span class="nav-label">لوحة التحكم</span></a>
+        <a href="#" class="nav-item"><i data-lucide="book-open"></i><span class="nav-label">الدورات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="library"></i><span class="nav-label">المكتبة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="rss"></i><span class="nav-label">المدونة</span></a>
+        <a href="#" class="nav-item active"><i data-lucide="users"></i><span class="nav-label">الطلاب</span></a>
+        <a href="#" class="nav-item"><i data-lucide="message-square"></i><span class="nav-label">المحادثة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="file-text"></i><span class="nav-label">الصفحات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="settings"></i><span class="nav-label">الإعدادات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="shield-check"></i><span class="nav-label">الصلاحيات</span></a>
+      </nav>
+
+      <div class="p-3 space-y-1.5">
+        <button class="cta-btn">
+          <i data-lucide="plus"></i>
+          <span class="cta-label">إضافة دورة جديدة</span>
+        </button>
+        <a href="#" class="nav-item"><i data-lucide="log-out"></i><span class="logout-label">تسجيل الخروج</span></a>
+      </div>
+    </aside>
+
+    <!-- Backdrop for mobile -->
+    <div class="backdrop" id="sb-backdrop"></div>
+
+    <!-- Main content -->
+    <main class="flex-1 min-w-0 order-2">
+      <!-- Top bar -->
+      <header class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-3 md:py-4">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2.5 py-0.5 text-xs font-semibold">٢٤٨ طالب</span>
+          <h1 class="text-base md:text-lg font-bold text-slate-900">الطلاب</h1>
+        </div>
+
+        <!-- Desktop Search -->
+        <div class="desktop-search mx-auto items-center gap-2">
+          <div class="relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-3 text-slate-400"></i>
+            <input type="text" placeholder="بحث عن طالب..."
+              class="w-[260px] rounded-lg border border-slate-200 bg-white ps-8 pe-3 py-2 text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500">
+          </div>
+          <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+            تصفية
+          </button>
+        </div>
+
+        <div class="ms-auto flex items-center gap-2 md:gap-2.5">
+          <button class="icon-btn relative">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span class="absolute top-1.5 end-1.5 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+          </button>
+          <img class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover ring-2 ring-white shadow" src="https://i.pravatar.cc/80?img=47" alt="User">
+
+          <!-- Mobile sidebar toggle (3 lines) -->
+          <button id="sb-toggle" aria-label="Toggle sidebar" class="icon-btn border border-slate-200 bg-white">
+            <i data-lucide="panel-right" class="w-4 h-4 only-desktop"></i>
+            <i data-lucide="menu" class="w-4 h-4 only-mobile"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Mobile search row -->
+      <div class="mobile-search md:hidden px-3 pb-2 flex items-center gap-2">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-2.5 text-slate-400"></i>
+          <input type="text" placeholder="بحث عن طالب..."
+            class="w-full rounded-lg border border-slate-200 bg-white ps-8 pe-3 py-1.5 text-xs">
+        </div>
+        <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs">
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="px-3 md:px-6 pb-8">
+
+        <!-- Selection bar -->
+        <div class="rounded-xl bg-slate-900 text-white px-3 py-2 flex flex-wrap items-center gap-2 md:gap-3 shadow-card">
+          <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-brand-500">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          </span>
+          <span class="text-xs font-medium">٣ طلاب محددين</span>
+
+          <div class="ms-auto flex items-center gap-2 md:gap-2.5">
+            <button class="inline-flex items-center gap-1.5 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30 px-2.5 py-1.5 text-xs font-medium hover:bg-rose-500/25">
+              <i data-lucide="ban" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">تعطيل الحسابات</span>
+            </button>
+            <button class="inline-flex items-center gap-1.5 rounded-lg bg-white text-slate-900 px-2.5 py-1.5 text-xs font-medium hover:bg-slate-100">
+              <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">إرسال إشعار</span>
+            </button>
+            <button class="icon-btn text-slate-300 hover:bg-white/10"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
+        </div>
+
+        <!-- Table card -->
+        <div class="mt-4 rounded-xl bg-white shadow-card border border-slate-100 overflow-visible">
+          <!-- Header row -->
+          <div class="row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5 text-xs text-slate-500 border-b border-slate-100">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="font-medium text-slate-600 text-xs">الاسم</div>
+            <div class="font-medium text-slate-600 col-hide-md text-xs">البريد/الهاتف</div>
+            <div class="font-medium text-slate-600 col-hide-md text-xs">المرحلة</div>
+            <div class="font-medium text-slate-600 col-hide-md text-xs">تاريخ التسجيل</div>
+            <div class="font-medium text-slate-600 flex items-center gap-1 text-xs">الحالة <i data-lucide="chevron-down" class="w-3 h-3"></i></div>
+            <div class="font-medium text-slate-600 text-xs">الإجراءات</div>
+          </div>
+
+          <!-- Row 1 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-amber-400" style="width:28px;height:28px;font-size:11px;">أ</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">أحمد محمود خليل</div>
+                <div class="text-xs text-slate-400">#STD-8821</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">ahmed.m@example.ps</div><div class="text-xs text-slate-400">+970 599 123 456</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">الثانوية</div>
+            <div class="col-hide-md text-slate-700 text-xs">١٢ أكتوبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu1" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu1">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-sky-400" style="width:28px;height:28px;font-size:11px;">س</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">سارة عبد الرحمن</div>
+                <div class="text-xs text-slate-400">#STD-9012</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">sara.a@example.ps</div><div class="text-xs text-slate-400">+970 568 987 654</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">إعدادية</div>
+            <div class="col-hide-md text-slate-700 text-xs">١٥ نوفمبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu2" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu2">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk" checked></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-violet-400" style="width:28px;height:28px;font-size:11px;">م</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">محمد يوسف العلي</div>
+                <div class="text-xs text-slate-400">#STD-7762</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">m.ali@example.ps</div><div class="text-xs text-slate-400">+970 592 555 000</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">ابتدائية</div>
+            <div class="col-hide-md text-slate-700 text-xs">٠٥ سبتمبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-slate-100 text-slate-500 px-2 py-0.5 text-[10px] font-semibold">معطل</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu3" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu3">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk"></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-rose-400" style="width:28px;height:28px;font-size:11px;">ل</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">ليلى إبراهيم جابر</div>
+                <div class="text-xs text-slate-400">#STD-4412</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">laila.j@example.ps</div><div class="text-xs text-slate-400">+970 597 111 222</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">الثانوية</div>
+            <div class="col-hide-md text-slate-700 text-xs">٢٠ ديسمبر ٢٠٢٣</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu4" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu4">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 5 -->
+          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
+            <div><input type="checkbox" class="chk"></div>
+            <div class="flex items-center gap-2">
+              <span class="avatar bg-emerald-400" style="width:28px;height:28px;font-size:11px;">خ</span>
+              <div>
+                <div class="font-semibold text-slate-900 text-sm leading-tight">خالد منصور</div>
+                <div class="text-xs text-slate-400">#STD-3398</div>
+              </div>
+            </div>
+            <div class="col-hide-md"><div class="text-slate-700 text-xs">khaled.m@example.ps</div><div class="text-xs text-slate-400">+970 594 333 444</div></div>
+            <div class="col-hide-md text-slate-700 text-xs">إعدادية</div>
+            <div class="col-hide-md text-slate-700 text-xs">٠١ يناير ٢٠٢٤</div>
+            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
+            <div class="relative">
+              <button class="icon-btn toggle-menu" data-target="menu5" style="width:28px;height:28px;">
+                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
+              </button>
+              <div class="menu-dropdown" id="menu5">
+                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
+                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
+                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex flex-wrap items-center gap-2 px-3 md:px-5 py-2.5 border-t border-slate-100 text-xs text-slate-500">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px]">الصفوف لكل صفحة:</span>
+              <button class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px]">١٠ <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+            </div>
+            <div class="hidden sm:block text-[11px]">عرض ١-١٠ من ٢٤٨</div>
+            <div class="ms-auto flex items-center gap-0.5">
+              <button class="page-btn" style="width:28px;height:28px;"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٢٥</button>
+              <span class="page-btn" style="width:28px;height:28px;font-size:12px;">…</span>
+              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٣</button>
+              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٢</button>
+              <button class="page-btn active" style="width:28px;height:28px;font-size:12px;">١</button>
+              <button class="page-btn" style="width:28px;height:28px;"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Sidebar toggle functionality
+    const body = document.body;
+    const toggle = document.getElementById('sb-toggle');
+    const backdrop = document.getElementById('sb-backdrop');
+    const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+    if (localStorage.getItem('sb-collapsed') === '1') {
+      body.classList.add('sb-collapsed');
+    }
+
+    toggle.addEventListener('click', () => {
+      if (isMobile()) {
+        body.classList.toggle('sb-open');
+      } else {
+        body.classList.toggle('sb-collapsed');
+        localStorage.setItem('sb-collapsed', body.classList.contains('sb-collapsed') ? '1' : '0');
+      }
+    });
+
+    backdrop.addEventListener('click', () => {
+      body.classList.remove('sb-open');
+    });
+
+    window.addEventListener('resize', () => {
+      if (!isMobile()) {
+        body.classList.remove('sb-open');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        body.classList.remove('sb-open');
+      }
+    });
+
+    // Toggle dropdown menus
+    document.querySelectorAll('.toggle-menu').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const targetId = this.getAttribute('data-target');
+        const menu = document.getElementById(targetId);
+        
+        document.querySelectorAll('.menu-dropdown').forEach(m => {
+          if (m.id !== targetId) {
+            m.classList.remove('show');
+          }
+        });
+        
+        menu.classList.toggle('show');
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.toggle-menu') && !e.target.closest('.menu-dropdown')) {
+        document.querySelectorAll('.menu-dropdown').forEach(menu => {
+          menu.classList.remove('show');
+        });
+      }
+    });
+
+    document.addEventListener('click', function() {
+      lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
