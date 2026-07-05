@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>إدارة الطلاب — النظام الوطني</title>
   
   <!-- Tailwind CSS via CDN -->
@@ -16,35 +16,577 @@
   <!-- Google Font: Cairo -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Custom CSS (separate from Tailwind) -->
   <style>
-    /* ----- CSS Variables & Reset ----- */
-    :root {
-      --sidebar-w: 260px;
-      --sidebar-w-icon: 68px;
+    /* ===== BASE ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
     html, body {
       background: #f6f7f9;
       font-family: 'Cairo', system-ui, sans-serif;
+      font-size: 14px;
+      color: #1e293b;
+      overflow-x: hidden;
     }
     
-    /* ----- Custom Components ----- */
-    .table-row + .table-row {
-      border-top: 1px solid #eef0f3;
+    /* ===== LAYOUT ===== */
+    .app {
+      display: flex;
+      min-height: 100vh;
     }
     
-    /* Custom Checkbox */
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 260px;
+      background: #071D17;
+      color: #cbd5e1;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+    }
+    
+    /* Desktop collapsed state */
+    body.sb-collapsed .sidebar {
+      width: 68px;
+    }
+    body.sb-collapsed .nav-item {
+      justify-content: center;
+      padding: 0.5rem 0.4rem;
+    }
+    body.sb-collapsed .nav-label,
+    body.sb-collapsed .brand-text,
+    body.sb-collapsed .cta-label,
+    body.sb-collapsed .logout-label {
+      display: none;
+    }
+    body.sb-collapsed .brand-row {
+      justify-content: center;
+    }
+    body.sb-collapsed .cta-btn {
+      padding: 0.6rem;
+      font-size: 0;
+    }
+    body.sb-collapsed .cta-btn span {
+      display: none;
+    }
+    body.sb-collapsed .cta-btn i {
+      margin: 0;
+    }
+    
+    /* Mobile sidebar - hidden by default */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1000;
+        transform: translateX(-100%);
+        width: 280px;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+        height: 100%;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .overlay {
+        display: block !important;
+      }
+      .mobile-toggle {
+        display: flex !important;
+      }
+      /* Reset desktop collapsed on mobile */
+      body.sb-collapsed .sidebar {
+        width: 280px;
+      }
+      body.sb-collapsed .nav-item {
+        justify-content: flex-start;
+        padding: 0.5rem 0.65rem;
+      }
+      body.sb-collapsed .nav-label,
+      body.sb-collapsed .brand-text,
+      body.sb-collapsed .cta-label,
+      body.sb-collapsed .logout-label {
+        display: inline;
+      }
+      body.sb-collapsed .brand-row {
+        justify-content: flex-start;
+      }
+      body.sb-collapsed .cta-btn {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.8rem;
+      }
+      body.sb-collapsed .cta-btn span {
+        display: inline;
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .sidebar {
+        position: sticky;
+        transform: none !important;
+      }
+      .overlay {
+        display: none !important;
+      }
+      .mobile-toggle {
+        display: none !important;
+      }
+    }
+    
+    /* ===== OVERLAY ===== */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    /* ===== SIDEBAR COMPONENTS ===== */
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: #059669;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .brand-icon i {
+      width: 20px;
+      height: 20px;
+      color: #fff;
+    }
+    .brand-text .title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .brand-text .sub {
+      color: #94a3b8;
+      font-size: 11px;
+    }
+    
+    .nav-list {
+      padding: 12px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.15s, color 0.15s;
+      cursor: pointer;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .nav-item.active {
+      background: #fff;
+      color: #0b1220;
+      font-weight: 600;
+    }
+    .nav-item i {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .nav-item .label {
+      white-space: nowrap;
+    }
+    
+    .sidebar-footer {
+      padding: 12px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px;
+      background: #10b981;
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cta-btn:hover {
+      background: #34d399;
+    }
+    .cta-btn i {
+      width: 18px;
+      height: 18px;
+    }
+    
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* ===== TOP HEADER ===== */
+    .top-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid #eef0f3;
+      flex-wrap: wrap;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .student-badge {
+      background: #d1fae5;
+      color: #047857;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      white-space: nowrap;
+    }
+    .page-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    
+    .header-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: auto;
+    }
+    .search-box {
+      position: relative;
+    }
+    .search-box i {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #94a3b8;
+    }
+    .search-box input {
+      padding: 8px 36px 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 13px;
+      width: 220px;
+      background: #fff;
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s;
+    }
+    .search-box input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+    }
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      color: #334155;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .filter-btn:hover {
+      background: #f8fafc;
+    }
+    .filter-btn i {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #475467;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      background: #f1f5f9;
+    }
+    .icon-btn i {
+      width: 18px;
+      height: 18px;
+    }
+    .notification-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 9999px;
+    }
+    .avatar-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 9999px;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .mobile-toggle {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #475467;
+      transition: background 0.15s;
+    }
+    .mobile-toggle:hover {
+      background: #f1f5f9;
+    }
+    .mobile-toggle i {
+      width: 22px;
+      height: 22px;
+    }
+    
+    /* ===== MOBILE SEARCH ===== */
+    .mobile-search {
+      display: none;
+      padding: 8px 20px 12px;
+      gap: 8px;
+      background: #fff;
+      border-bottom: 1px solid #eef0f3;
+    }
+    .mobile-search .search-box {
+      flex: 1;
+    }
+    .mobile-search .search-box input {
+      width: 100%;
+    }
+    
+    /* ===== CONTENT AREA ===== */
+    .content-area {
+      padding: 20px;
+      flex: 1;
+    }
+    
+    /* ===== SELECTION BAR ===== */
+    .selection-bar {
+      background: #0f172a;
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .selection-check {
+      width: 28px;
+      height: 28px;
+      background: #10b981;
+      border-radius: 9999px;
+      display: grid;
+      place-items: center;
+    }
+    .selection-check i {
+      width: 16px;
+      height: 16px;
+    }
+    .selection-text {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .selection-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: auto;
+    }
+    .selection-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .selection-btn.danger {
+      background: rgba(244,63,94,0.15);
+      color: #fda4af;
+      border: 1px solid rgba(244,63,94,0.3);
+    }
+    .selection-btn.danger:hover {
+      background: rgba(244,63,94,0.25);
+    }
+    .selection-btn.light {
+      background: #fff;
+      color: #0f172a;
+    }
+    .selection-btn.light:hover {
+      background: #f1f5f9;
+    }
+    .selection-btn i {
+      width: 16px;
+      height: 16px;
+    }
+    
+    /* ===== TABLE ===== */
+    .table-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+      overflow: hidden;
+    }
+    
+    /* Table grid - responsive */
+    .table-header, .table-row {
+      display: grid;
+      grid-template-columns: 40px 1.8fr 1.6fr 1fr 1fr 0.9fr 52px;
+      gap: 12px;
+      align-items: center;
+    }
+    .table-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .table-header .status-header {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .table-header .status-header i {
+      width: 14px;
+      height: 14px;
+    }
+    
+    .table-row {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.1s;
+    }
+    .table-row:last-child {
+      border-bottom: none;
+    }
+    
+    /* ===== TABLE RESPONSIVE BREAKPOINTS ===== */
+    /* Tablets */
+    @media (max-width: 1024px) {
+      .table-header, .table-row {
+        grid-template-columns: 36px 1.6fr 1.2fr 0.8fr 0.8fr 48px;
+        gap: 8px;
+        padding: 10px 14px;
+      }
+    }
+    
+    /* Mobile */
+    @media (max-width: 768px) {
+      .table-header, .table-row {
+        grid-template-columns: 32px 1.4fr 0.8fr 44px;
+        gap: 6px;
+        padding: 8px 12px;
+      }
+      .col-hide-md {
+        display: none !important;
+      }
+    }
+    
+    /* Small phones */
+    @media (max-width: 480px) {
+      .table-header, .table-row {
+        grid-template-columns: 28px 1fr 40px;
+        gap: 4px;
+        padding: 6px 10px;
+      }
+      .col-hide-sm {
+        display: none !important;
+      }
+    }
+    
+    /* ===== TABLE COMPONENTS ===== */
     .chk {
       appearance: none;
       width: 18px;
       height: 18px;
       border: 1.5px solid #d5d9e0;
       border-radius: 5px;
-      display: inline-grid;
+      display: grid;
       place-items: center;
       background: #fff;
       cursor: pointer;
-      transition: all .15s;
+      transition: all 0.15s;
       flex-shrink: 0;
     }
     .chk:checked {
@@ -58,123 +600,57 @@
       background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center/contain no-repeat;
     }
     
-    /* Sidebar - Desktop */
-    .sidebar {
-      width: var(--sidebar-w);
-      transition: width .25s ease, transform .25s ease;
-      background: #071D17;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-    }
-    .nav-item {
-      transition: background .15s, color .15s;
+    .student-info {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      border-radius: 0.6rem;
-      padding: 0.5rem 0.65rem;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      text-decoration: none;
-      cursor: pointer;
+      gap: 10px;
     }
-    .nav-item:hover {
-      background: rgba(255, 255, 255, .04);
-    }
-    .nav-item.active {
-      background: #fff;
-      color: #0b1220;
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      display: grid;
+      place-items: center;
       font-weight: 600;
-    }
-    .nav-label,
-    .brand-text,
-    .cta-label,
-    .logout-label {
-      transition: opacity .15s ease;
-      white-space: nowrap;
-    }
-    .nav-item i {
-      width: 1.1rem;
-      height: 1.1rem;
+      color: #fff;
+      font-size: 13px;
       flex-shrink: 0;
     }
-    
-    /* Collapsed state (desktop) */
-    body.sb-collapsed .sidebar {
-      width: var(--sidebar-w-icon);
+    .student-name {
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 14px;
+      line-height: 1.2;
     }
-    body.sb-collapsed .nav-item {
-      justify-content: center;
-      padding-inline: 0.4rem;
+    .student-id {
+      font-size: 11px;
+      color: #94a3b8;
     }
-    body.sb-collapsed .nav-label,
-    body.sb-collapsed .brand-text,
-    body.sb-collapsed .cta-label,
-    body.sb-collapsed .logout-label {
-      opacity: 0;
-      width: 0;
-      overflow: hidden;
+    .student-email {
+      font-size: 12px;
+      color: #334155;
     }
-    body.sb-collapsed .brand-row {
-      justify-content: center;
+    .student-phone {
+      font-size: 11px;
+      color: #94a3b8;
     }
-    body.sb-collapsed .cta-btn {
-      padding: 0.6rem;
+    .student-level {
+      font-size: 13px;
+      color: #334155;
     }
-    
-    /* Mobile sidebar (off-canvas) - hidden by default, shown when sb-open class is added */
-    @media (max-width: 768px) {
-      .sidebar {
-        position: fixed;
-        inset-block: 0;
-        inset-inline-start: 0;
-        z-index: 60;
-        transform: translateX(-100%);
-        box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
-        width: 280px;
-        height: 100%;
-        overflow-y: auto;
-        transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      html[dir="rtl"] .sidebar {
-        transform: translateX(-100%);
-      }
-      body.sb-open .sidebar {
-        transform: translateX(0);
-      }
-      body.sb-open .backdrop {
-        opacity: 1;
-        pointer-events: auto;
-      }
-      
-      /* Show mobile toggle button (3 lines) */
-      .mobile-toggle {
-        display: inline-flex !important;
-      }
+    .student-date {
+      font-size: 12px;
+      color: #334155;
     }
     
-    /* Hide mobile toggle on desktop */
-    .mobile-toggle {
-      display: none;
+    .badge-dot {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
     }
-    
-    /* Backdrop */
-    .backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 26, 36, .5);
-      z-index: 50;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s ease;
-    }
-    
-    /* Badge with dot */
     .badge-dot::before {
       content: '';
       width: 5px;
@@ -182,68 +658,132 @@
       border-radius: 9999px;
       background: currentColor;
       display: inline-block;
-      margin-inline-end: 5px;
-      vertical-align: middle;
+      margin-left: 6px;
+    }
+    .badge-active {
+      background: #d1fae5;
+      color: #047857;
+    }
+    .badge-inactive {
+      background: #f1f5f9;
+      color: #64748b;
     }
     
-    /* Dropdown menu */
-    .menu-dropdown {
-      display: none;
-      animation: pop .12s ease-out;
-      transform-origin: top center;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      inset-inline-end: 2.8rem;
-      z-index: 20;
-      width: 11rem;
-      border-radius: 0.6rem;
-      background: #fff;
-      box-shadow: 0 10px 30px -10px rgba(16,24,40,.15);
-      border: 1px solid #f1f5f9;
-      padding: 0.3rem;
-    }
-    .menu-dropdown.show {
-      display: block;
-    }
-    .menu-dropdown button {
-      width: 100%;
+    .actions-cell {
+      position: relative;
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-radius: 0.4rem;
-      padding: 0.4rem 0.6rem;
-      font-size: 0.8rem;
-      color: #334155;
+      justify-content: center;
+    }
+    .menu-btn {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #475467;
       background: transparent;
       border: none;
       cursor: pointer;
-      transition: background .15s;
+      transition: background 0.15s;
     }
-    .menu-dropdown button:hover {
-      background: #f8fafc;
+    .menu-btn:hover {
+      background: #f1f5f9;
     }
-    .menu-dropdown button i {
-      width: 1rem;
-      height: 1rem;
-      flex-shrink: 0;
-    }
-    .menu-dropdown .text-rose-600 {
-      color: #e11d48;
-    }
-    .menu-dropdown .text-rose-600:hover {
-      background: #fff1f2;
-    }
-    @keyframes pop {
-      from { opacity: 0; transform: translateY(-50%) scale(.96); }
-      to { opacity: 1; transform: translateY(-50%) scale(1); }
+    .menu-btn i {
+      width: 18px;
+      height: 18px;
     }
     
-    /* Page buttons */
+    /* ===== DROPDOWN MENU ===== */
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 40px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(16,24,40,0.15);
+      border: 1px solid #f1f5f9;
+      padding: 6px;
+      width: 160px;
+      z-index: 50;
+      animation: popIn 0.12s ease-out;
+    }
+    .dropdown-menu.open {
+      display: block;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(-50%) scale(0.95); }
+      to { opacity: 1; transform: translateY(-50%) scale(1); }
+    }
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 7px 10px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .dropdown-menu button:hover {
+      background: #f8fafc;
+    }
+    .dropdown-menu button i {
+      width: 16px;
+      height: 16px;
+    }
+    .dropdown-menu .danger-btn {
+      color: #e11d48;
+    }
+    .dropdown-menu .danger-btn:hover {
+      background: #fff1f2;
+    }
+    
+    /* ===== PAGINATION ===== */
+    .pagination {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .pagination .per-page {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .per-page select {
+      padding: 4px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 12px;
+      background: #fff;
+      color: #334155;
+      font-family: inherit;
+    }
+    .pagination .info {
+      display: block;
+    }
+    .pagination .pages {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-right: auto;
+    }
     .page-btn {
       width: 32px;
       height: 32px;
-      display: inline-grid;
+      display: grid;
       place-items: center;
       border-radius: 6px;
       font-size: 13px;
@@ -251,309 +791,220 @@
       background: transparent;
       border: none;
       cursor: pointer;
-      transition: background .15s;
+      transition: background 0.15s;
     }
     .page-btn:hover {
-      background: #f2f4f7;
+      background: #f1f5f9;
     }
     .page-btn.active {
       background: #059669;
       color: #fff;
     }
-    
-    /* Icon button */
-    .icon-btn {
-      width: 32px;
-      height: 32px;
-      display: inline-grid;
-      place-items: center;
-      border-radius: 8px;
-      color: #475467;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      transition: background .15s;
-      flex-shrink: 0;
-    }
-    .icon-btn:hover {
-      background: #f2f4f7;
-    }
-    .icon-btn i {
-      width: 1.1rem;
-      height: 1.1rem;
+    .page-btn i {
+      width: 16px;
+      height: 16px;
     }
     
-    /* Avatar */
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 9999px;
-      display: inline-grid;
-      place-items: center;
-      font-weight: 600;
-      color: #fff;
-      font-size: 13px;
-      flex-shrink: 0;
+    /* ===== RESPONSIVE ADJUSTMENTS ===== */
+    @media (max-width: 1024px) {
+      .top-header {
+        padding: 10px 16px;
+      }
+      .search-box input {
+        width: 180px;
+      }
+      .content-area {
+        padding: 16px;
+      }
     }
     
-    /* Responsive helpers */
-    .only-desktop { display: inline-grid; }
-    .only-mobile { display: none; }
     @media (max-width: 768px) {
-      .only-desktop { display: none; }
-      .only-mobile { display: inline-grid; }
-    }
-    
-    /* Brand row */
-    .brand-row {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 1rem 0.8rem;
-    }
-    .brand-row .brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 0.6rem;
-      background: #059669;
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-    }
-    .brand-row .brand-icon i {
-      width: 1.1rem;
-      height: 1.1rem;
-      color: #fff;
-    }
-    .brand-text .brand-title {
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
-    .brand-text .brand-sub {
-      color: #94a3b8;
-      font-size: 0.65rem;
-    }
-    
-    /* CTA button */
-    .cta-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      width: 100%;
-      border-radius: 0.6rem;
-      background: #10b981;
-      color: #0f172a;
-      font-weight: 600;
-      font-size: 0.8rem;
-      padding: 0.6rem 0.8rem;
-      border: none;
-      cursor: pointer;
-      transition: background .15s;
-      box-shadow: 0 8px 20px -8px rgba(16, 185, 129, 0.3);
-    }
-    .cta-btn:hover {
-      background: #34d399;
-    }
-    .cta-btn i {
-      width: 1.1rem;
-      height: 1.1rem;
-    }
-    
-    /* Table column visibility - desktop shows all */
-    .col-hide-md {
-      display: block;
-    }
-    
-    /* Tablet adjustments */
-    @media (max-width: 1024px) and (min-width: 769px) {
-      .sidebar {
-        width: 220px;
+      .top-header {
+        padding: 10px 14px;
+        gap: 8px;
       }
-      body.sb-collapsed .sidebar {
-        width: 60px;
+      .page-title {
+        font-size: 16px;
       }
-      .row-grid {
-        grid-template-columns: 36px 1.2fr 1fr 0.8fr 36px !important;
-        gap: 0.6rem !important;
-        padding-inline: 0.8rem !important;
-      }
-      .table-row .font-semibold {
-        font-size: 0.85rem;
-      }
-      .table-row .text-xs {
-        font-size: 0.7rem;
-      }
-      .table-row .avatar {
-        width: 30px;
-        height: 30px;
-        font-size: 12px;
-      }
-      .brand-text .brand-title {
-        font-size: 0.85rem;
-      }
-      .brand-text .brand-sub {
-        font-size: 0.6rem;
-      }
-    }
-    
-    /* Mobile (up to 768px) - sidebar becomes off-canvas, hidden by default */
-    @media (max-width: 768px) {
-      /* Sidebar becomes fixed and hidden */
-      .sidebar {
-        position: fixed;
-        inset-block: 0;
-        inset-inline-start: 0;
-        z-index: 60;
-        transform: translateX(-100%);
-        box-shadow: 10px 0 30px -10px rgba(0, 0, 0, .4);
-        width: 280px;
-        height: 100%;
-        overflow-y: auto;
-        transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      html[dir="rtl"] .sidebar {
-        transform: translateX(-100%);
-      }
-      body.sb-open .sidebar {
-        transform: translateX(0);
-      }
-      body.sb-open .backdrop {
-        opacity: 1;
-        pointer-events: auto;
-      }
-      
-      /* Show mobile toggle button (3 lines) */
-      .mobile-toggle {
-        display: inline-flex !important;
-      }
-      
-      /* Table grid for mobile */
-      .row-grid {
-        grid-template-columns: 32px 1.2fr 0.8fr 32px !important;
-        gap: 0.4rem !important;
-        padding-inline: 0.5rem !important;
-      }
-      
-      /* Hide email/phone column on mobile */
-      .col-hide-md {
+      .header-search {
         display: none !important;
       }
-      
-      /* Table cells styling */
-      .table-row {
-        padding-block: 0.5rem !important;
+      .mobile-search {
+        display: flex !important;
       }
-      .table-row .font-semibold {
-        font-size: 0.8rem;
-        line-height: 1.2;
+      .content-area {
+        padding: 12px;
       }
-      .table-row .text-xs {
-        font-size: 0.6rem;
+      .selection-bar {
+        padding: 8px 12px;
       }
-      .table-row .avatar {
+      .selection-text {
+        font-size: 12px;
+      }
+      .selection-btn {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+      .student-name {
+        font-size: 13px;
+      }
+      .avatar {
         width: 28px;
         height: 28px;
         font-size: 11px;
       }
       .badge-dot {
-        font-size: 9px !important;
-        padding: 0.15rem 0.5rem !important;
-      }
-      
-      /* Header row */
-      .row-grid .font-medium {
-        font-size: 0.65rem !important;
-      }
-      .row-grid .chk {
-        width: 16px !important;
-        height: 16px !important;
-      }
-      
-      /* Mobile search shows */
-      .mobile-search {
-        display: flex !important;
-      }
-      .desktop-search {
-        display: none !important;
-      }
-    }
-    
-    /* Very small phones */
-    @media (max-width: 480px) {
-      .row-grid {
-        grid-template-columns: 28px 1fr 28px !important;
-        gap: 0.3rem !important;
-        padding-inline: 0.4rem !important;
-      }
-      .table-row .flex.items-center.gap-2 {
-        gap: 0.3rem !important;
-      }
-      .table-row .avatar {
-        width: 24px !important;
-        height: 24px !important;
-        font-size: 10px !important;
-      }
-      .table-row .font-semibold {
-        font-size: 0.75rem !important;
-      }
-      .table-row .text-xs {
-        font-size: 0.55rem !important;
-      }
-      .badge-dot {
-        font-size: 8px !important;
-        padding: 0.1rem 0.4rem !important;
+        font-size: 10px;
+        padding: 1px 10px;
       }
       .badge-dot::before {
         width: 4px;
         height: 4px;
-        margin-inline-end: 3px;
+        margin-left: 4px;
       }
-      .icon-btn {
-        width: 26px !important;
-        height: 26px !important;
+      .dropdown-menu {
+        width: 150px;
+        left: 34px;
       }
-      .icon-btn i {
-        width: 0.9rem !important;
-        height: 0.9rem !important;
+      .dropdown-menu button {
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+      .pagination {
+        padding: 8px 12px;
+        font-size: 11px;
       }
       .page-btn {
-        width: 26px !important;
-        height: 26px !important;
-        font-size: 11px !important;
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
       }
       .page-btn i {
-        width: 0.9rem !important;
-        height: 0.9rem !important;
-      }
-      .menu-dropdown {
-        width: 9rem !important;
-        inset-inline-end: 2.2rem !important;
-      }
-      .menu-dropdown button {
-        font-size: 0.7rem !important;
-        padding: 0.3rem 0.5rem !important;
-      }
-      .menu-dropdown button i {
-        width: 0.8rem !important;
-        height: 0.8rem !important;
+        width: 14px;
+        height: 14px;
       }
     }
     
-    /* Desktop search visible */
-    .desktop-search {
-      display: flex;
-    }
-    .mobile-search {
-      display: none;
+    @media (max-width: 480px) {
+      .top-header {
+        padding: 8px 10px;
+      }
+      .student-badge {
+        font-size: 10px;
+        padding: 2px 8px;
+      }
+      .page-title {
+        font-size: 14px;
+      }
+      .icon-btn {
+        width: 32px;
+        height: 32px;
+      }
+      .icon-btn i {
+        width: 16px;
+        height: 16px;
+      }
+      .avatar-img {
+        width: 30px;
+        height: 30px;
+      }
+      .mobile-search {
+        padding: 6px 10px 10px;
+      }
+      .content-area {
+        padding: 8px;
+      }
+      .selection-bar {
+        padding: 6px 10px;
+        border-radius: 10px;
+      }
+      .selection-check {
+        width: 24px;
+        height: 24px;
+      }
+      .selection-check i {
+        width: 14px;
+        height: 14px;
+      }
+      .selection-btn {
+        padding: 4px 8px;
+        font-size: 10px;
+      }
+      .selection-btn i {
+        width: 14px;
+        height: 14px;
+      }
+      .student-name {
+        font-size: 12px;
+      }
+      .student-id {
+        font-size: 9px;
+      }
+      .avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+      }
+      .chk {
+        width: 16px;
+        height: 16px;
+      }
+      .chk:checked::after {
+        width: 8px;
+        height: 8px;
+      }
+      .badge-dot {
+        font-size: 9px;
+        padding: 1px 8px;
+      }
+      .badge-dot::before {
+        width: 3px;
+        height: 3px;
+        margin-left: 3px;
+      }
+      .menu-btn {
+        width: 28px;
+        height: 28px;
+      }
+      .menu-btn i {
+        width: 16px;
+        height: 16px;
+      }
+      .dropdown-menu {
+        width: 130px;
+        left: 28px;
+        padding: 4px;
+      }
+      .dropdown-menu button {
+        font-size: 11px;
+        padding: 5px 8px;
+        gap: 6px;
+      }
+      .dropdown-menu button i {
+        width: 14px;
+        height: 14px;
+      }
+      .pagination {
+        padding: 6px 10px;
+        font-size: 10px;
+        gap: 4px;
+      }
+      .page-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+      }
+      .page-btn i {
+        width: 14px;
+        height: 14px;
+      }
+      .per-page select {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
     }
     
-    /* Pagination */
-    .pagination-text {
-      font-size: 0.6rem !important;
-    }
-    
+    /* Scrollbar for sidebar */
     .sidebar::-webkit-scrollbar {
       width: 4px;
     }
@@ -566,360 +1017,360 @@
     }
   </style>
 </head>
-<body class="text-[14px] text-slate-800">
+<body>
 
-  <!-- Main container with RTL direction -->
-  <div class="min-h-screen flex" style="direction: rtl;">
+  <!-- OVERLAY (mobile) -->
+  <div class="overlay" id="overlay"></div>
 
-    <!-- Sidebar -->
-    <aside class="sidebar shrink-0 text-slate-300 flex flex-col order-1" id="sidebar">
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
       <div class="brand-row">
         <div class="brand-icon">
           <i data-lucide="graduation-cap"></i>
         </div>
-        <div class="brand-text text-right">
-          <div class="brand-title">إدارة التعليم</div>
-          <div class="brand-sub">النظام الوطني</div>
+        <div class="brand-text">
+          <div class="title">إدارة التعليم</div>
+          <div class="sub">النظام الوطني</div>
         </div>
       </div>
 
-      <nav class="mt-1.5 px-2.5 space-y-0.5 flex-1">
-        <a href="#" class="nav-item"><i data-lucide="layout-grid"></i><span class="nav-label">لوحة التحكم</span></a>
-        <a href="#" class="nav-item"><i data-lucide="book-open"></i><span class="nav-label">الدورات</span></a>
-        <a href="#" class="nav-item"><i data-lucide="library"></i><span class="nav-label">المكتبة</span></a>
-        <a href="#" class="nav-item"><i data-lucide="rss"></i><span class="nav-label">المدونة</span></a>
-        <a href="#" class="nav-item active"><i data-lucide="users"></i><span class="nav-label">الطلاب</span></a>
-        <a href="#" class="nav-item"><i data-lucide="message-square"></i><span class="nav-label">المحادثة</span></a>
-        <a href="#" class="nav-item"><i data-lucide="file-text"></i><span class="nav-label">الصفحات</span></a>
-        <a href="#" class="nav-item"><i data-lucide="settings"></i><span class="nav-label">الإعدادات</span></a>
-        <a href="#" class="nav-item"><i data-lucide="shield-check"></i><span class="nav-label">الصلاحيات</span></a>
+      <nav class="nav-list">
+        <a href="#" class="nav-item"><i data-lucide="layout-grid"></i><span class="label">لوحة التحكم</span></a>
+        <a href="#" class="nav-item"><i data-lucide="book-open"></i><span class="label">الدورات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="library"></i><span class="label">المكتبة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="rss"></i><span class="label">المدونة</span></a>
+        <a href="#" class="nav-item active"><i data-lucide="users"></i><span class="label">الطلاب</span></a>
+        <a href="#" class="nav-item"><i data-lucide="message-square"></i><span class="label">المحادثة</span></a>
+        <a href="#" class="nav-item"><i data-lucide="file-text"></i><span class="label">الصفحات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="settings"></i><span class="label">الإعدادات</span></a>
+        <a href="#" class="nav-item"><i data-lucide="shield-check"></i><span class="label">الصلاحيات</span></a>
       </nav>
 
-      <div class="p-3 space-y-1.5">
+      <div class="sidebar-footer">
         <button class="cta-btn">
           <i data-lucide="plus"></i>
-          <span class="cta-label">إضافة دورة جديدة</span>
+          <span>إضافة دورة جديدة</span>
         </button>
-        <a href="#" class="nav-item"><i data-lucide="log-out"></i><span class="logout-label">تسجيل الخروج</span></a>
+        <a href="#" class="nav-item"><i data-lucide="log-out"></i><span class="label">تسجيل الخروج</span></a>
       </div>
     </aside>
 
-    <!-- Backdrop for mobile -->
-    <div class="backdrop" id="sb-backdrop"></div>
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
 
-    <!-- Main content -->
-    <main class="flex-1 min-w-0 order-2">
-      <!-- Top bar -->
-      <header class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-3 md:py-4">
-        <div class="flex items-center gap-2">
-          <span class="inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2.5 py-0.5 text-xs font-semibold">٢٤٨ طالب</span>
-          <h1 class="text-base md:text-lg font-bold text-slate-900">الطلاب</h1>
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <span class="student-badge">٢٤٨ طالب</span>
+          <h1 class="page-title">الطلاب</h1>
         </div>
 
         <!-- Desktop Search -->
-        <div class="desktop-search mx-auto items-center gap-2">
-          <div class="relative">
-            <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-3 text-slate-400"></i>
-            <input type="text" placeholder="بحث عن طالب..."
-              class="w-[260px] rounded-lg border border-slate-200 bg-white ps-8 pe-3 py-2 text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500">
+        <div class="header-search">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" placeholder="بحث عن طالب..." />
           </div>
-          <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+          <button class="filter-btn">
+            <i data-lucide="sliders-horizontal"></i>
             تصفية
           </button>
         </div>
 
-        <div class="ms-auto flex items-center gap-2 md:gap-2.5">
-          <button class="icon-btn relative">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            <span class="absolute top-1.5 end-1.5 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+        <div class="header-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+            <span class="notification-dot"></span>
           </button>
-          <img class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover ring-2 ring-white shadow" src="https://i.pravatar.cc/80?img=47" alt="User">
-
-          <!-- Mobile sidebar toggle (3 lines) - only visible on mobile -->
-          <button id="sb-toggle" aria-label="Toggle sidebar" class="icon-btn border border-slate-200 bg-white mobile-toggle">
-            <i data-lucide="menu" class="w-4 h-4"></i>
+          <img class="avatar-img" src="https://i.pravatar.cc/80?img=47" alt="User" />
+          
+          <!-- Mobile toggle -->
+          <button class="mobile-toggle" id="menuToggle" aria-label="Toggle sidebar">
+            <i data-lucide="menu"></i>
           </button>
         </div>
       </header>
 
-      <!-- Mobile search row -->
-      <div class="mobile-search md:hidden px-3 pb-2 flex items-center gap-2">
-        <div class="relative flex-1">
-          <i data-lucide="search" class="w-3.5 h-3.5 absolute top-1/2 -translate-y-1/2 start-2.5 text-slate-400"></i>
-          <input type="text" placeholder="بحث عن طالب..."
-            class="w-full rounded-lg border border-slate-200 bg-white ps-8 pe-3 py-1.5 text-xs">
+      <!-- MOBILE SEARCH -->
+      <div class="mobile-search">
+        <div class="search-box">
+          <i data-lucide="search"></i>
+          <input type="text" placeholder="بحث عن طالب..." />
         </div>
-        <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs">
-          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+        <button class="filter-btn" style="padding:6px 10px;">
+          <i data-lucide="sliders-horizontal"></i>
         </button>
       </div>
 
-      <!-- Content -->
-      <div class="px-3 md:px-6 pb-8">
+      <!-- CONTENT -->
+      <div class="content-area">
 
-        <!-- Selection bar -->
-        <div class="rounded-xl bg-slate-900 text-white px-3 py-2 flex flex-wrap items-center gap-2 md:gap-3 shadow-card">
-          <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-brand-500">
-            <i data-lucide="check" class="w-3.5 h-3.5"></i>
-          </span>
-          <span class="text-xs font-medium">٣ طلاب محددين</span>
+        <!-- SELECTION BAR -->
+        <div class="selection-bar">
+          <div class="selection-check">
+            <i data-lucide="check"></i>
+          </div>
+          <span class="selection-text">٣ طلاب محددين</span>
 
-          <div class="ms-auto flex items-center gap-2 md:gap-2.5">
-            <button class="inline-flex items-center gap-1.5 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30 px-2.5 py-1.5 text-xs font-medium hover:bg-rose-500/25">
-              <i data-lucide="ban" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">تعطيل الحسابات</span>
+          <div class="selection-actions">
+            <button class="selection-btn danger">
+              <i data-lucide="ban"></i>
+              <span class="btn-text">تعطيل الحسابات</span>
             </button>
-            <button class="inline-flex items-center gap-1.5 rounded-lg bg-white text-slate-900 px-2.5 py-1.5 text-xs font-medium hover:bg-slate-100">
-              <i data-lucide="mail" class="w-3.5 h-3.5"></i>
-              <span class="hidden sm:inline">إرسال إشعار</span>
+            <button class="selection-btn light">
+              <i data-lucide="mail"></i>
+              <span class="btn-text">إرسال إشعار</span>
             </button>
-            <button class="icon-btn text-slate-300 hover:bg-white/10"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+            <button class="icon-btn" style="color:#94a3b8;">
+              <i data-lucide="x"></i>
+            </button>
           </div>
         </div>
 
-        <!-- Table card -->
-        <div class="mt-4 rounded-xl bg-white shadow-card border border-slate-100 overflow-visible">
-          <!-- Header row -->
-          <div class="row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5 text-xs text-slate-500 border-b border-slate-100">
-            <div><input type="checkbox" class="chk" checked></div>
-            <div class="font-medium text-slate-600 text-xs">الاسم</div>
-            <div class="font-medium text-slate-600 col-hide-md text-xs">البريد/الهاتف</div>
-            <div class="font-medium text-slate-600 col-hide-md text-xs">المرحلة</div>
-            <div class="font-medium text-slate-600 col-hide-md text-xs">تاريخ التسجيل</div>
-            <div class="font-medium text-slate-600 flex items-center gap-1 text-xs">الحالة <i data-lucide="chevron-down" class="w-3 h-3"></i></div>
-            <div class="font-medium text-slate-600 text-xs">الإجراءات</div>
+        <!-- TABLE -->
+        <div class="table-card">
+
+          <!-- Header -->
+          <div class="table-header">
+            <div><input type="checkbox" class="chk" checked /></div>
+            <div>الاسم</div>
+            <div class="col-hide-md">البريد/الهاتف</div>
+            <div class="col-hide-md col-hide-sm">المرحلة</div>
+            <div class="col-hide-md col-hide-sm">تاريخ التسجيل</div>
+            <div class="status-header"><span>الحالة</span> <i data-lucide="chevron-down"></i></div>
+            <div>الإجراءات</div>
           </div>
 
           <!-- Row 1 -->
-          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
-            <div><input type="checkbox" class="chk" checked></div>
-            <div class="flex items-center gap-2">
-              <span class="avatar bg-amber-400" style="width:28px;height:28px;font-size:11px;">أ</span>
+          <div class="table-row">
+            <div><input type="checkbox" class="chk" checked /></div>
+            <div class="student-info">
+              <span class="avatar" style="background:#fbbf24;">أ</span>
               <div>
-                <div class="font-semibold text-slate-900 text-sm leading-tight">أحمد محمود خليل</div>
-                <div class="text-xs text-slate-400">#STD-8821</div>
+                <div class="student-name">أحمد محمود خليل</div>
+                <div class="student-id">#STD-8821</div>
               </div>
             </div>
-            <div class="col-hide-md"><div class="text-slate-700 text-xs">ahmed.m@example.ps</div><div class="text-xs text-slate-400">+970 599 123 456</div></div>
-            <div class="col-hide-md text-slate-700 text-xs">الثانوية</div>
-            <div class="col-hide-md text-slate-700 text-xs">١٢ أكتوبر ٢٠٢٣</div>
-            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
-            <div class="relative">
-              <button class="icon-btn toggle-menu" data-target="menu1" style="width:28px;height:28px;">
-                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
-              </button>
-              <div class="menu-dropdown" id="menu1">
-                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
-                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
-                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+            <div class="col-hide-md">
+              <div class="student-email">ahmed.m@example.ps</div>
+              <div class="student-phone">+970 599 123 456</div>
+            </div>
+            <div class="col-hide-md col-hide-sm student-level">الثانوية</div>
+            <div class="col-hide-md col-hide-sm student-date">١٢ أكتوبر ٢٠٢٣</div>
+            <div><span class="badge-dot badge-active">نشط</span></div>
+            <div class="actions-cell">
+              <button class="menu-btn toggle-menu" data-target="menu1"><i data-lucide="more-vertical"></i></button>
+              <div class="dropdown-menu" id="menu1">
+                <button><i data-lucide="eye"></i> عرض الملف</button>
+                <button><i data-lucide="send"></i> إرسال إشعار</button>
+                <button class="danger-btn"><i data-lucide="ban"></i> تعطيل الحساب</button>
               </div>
             </div>
           </div>
 
           <!-- Row 2 -->
-          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
-            <div><input type="checkbox" class="chk" checked></div>
-            <div class="flex items-center gap-2">
-              <span class="avatar bg-sky-400" style="width:28px;height:28px;font-size:11px;">س</span>
+          <div class="table-row">
+            <div><input type="checkbox" class="chk" checked /></div>
+            <div class="student-info">
+              <span class="avatar" style="background:#38bdf8;">س</span>
               <div>
-                <div class="font-semibold text-slate-900 text-sm leading-tight">سارة عبد الرحمن</div>
-                <div class="text-xs text-slate-400">#STD-9012</div>
+                <div class="student-name">سارة عبد الرحمن</div>
+                <div class="student-id">#STD-9012</div>
               </div>
             </div>
-            <div class="col-hide-md"><div class="text-slate-700 text-xs">sara.a@example.ps</div><div class="text-xs text-slate-400">+970 568 987 654</div></div>
-            <div class="col-hide-md text-slate-700 text-xs">إعدادية</div>
-            <div class="col-hide-md text-slate-700 text-xs">١٥ نوفمبر ٢٠٢٣</div>
-            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
-            <div class="relative">
-              <button class="icon-btn toggle-menu" data-target="menu2" style="width:28px;height:28px;">
-                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
-              </button>
-              <div class="menu-dropdown" id="menu2">
-                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
-                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
-                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+            <div class="col-hide-md">
+              <div class="student-email">sara.a@example.ps</div>
+              <div class="student-phone">+970 568 987 654</div>
+            </div>
+            <div class="col-hide-md col-hide-sm student-level">إعدادية</div>
+            <div class="col-hide-md col-hide-sm student-date">١٥ نوفمبر ٢٠٢٣</div>
+            <div><span class="badge-dot badge-active">نشط</span></div>
+            <div class="actions-cell">
+              <button class="menu-btn toggle-menu" data-target="menu2"><i data-lucide="more-vertical"></i></button>
+              <div class="dropdown-menu" id="menu2">
+                <button><i data-lucide="eye"></i> عرض الملف</button>
+                <button><i data-lucide="send"></i> إرسال إشعار</button>
+                <button class="danger-btn"><i data-lucide="ban"></i> تعطيل الحساب</button>
               </div>
             </div>
           </div>
 
           <!-- Row 3 -->
-          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
-            <div><input type="checkbox" class="chk" checked></div>
-            <div class="flex items-center gap-2">
-              <span class="avatar bg-violet-400" style="width:28px;height:28px;font-size:11px;">م</span>
+          <div class="table-row">
+            <div><input type="checkbox" class="chk" checked /></div>
+            <div class="student-info">
+              <span class="avatar" style="background:#a78bfa;">م</span>
               <div>
-                <div class="font-semibold text-slate-900 text-sm leading-tight">محمد يوسف العلي</div>
-                <div class="text-xs text-slate-400">#STD-7762</div>
+                <div class="student-name">محمد يوسف العلي</div>
+                <div class="student-id">#STD-7762</div>
               </div>
             </div>
-            <div class="col-hide-md"><div class="text-slate-700 text-xs">m.ali@example.ps</div><div class="text-xs text-slate-400">+970 592 555 000</div></div>
-            <div class="col-hide-md text-slate-700 text-xs">ابتدائية</div>
-            <div class="col-hide-md text-slate-700 text-xs">٠٥ سبتمبر ٢٠٢٣</div>
-            <div><span class="badge-dot inline-flex items-center rounded-full bg-slate-100 text-slate-500 px-2 py-0.5 text-[10px] font-semibold">معطل</span></div>
-            <div class="relative">
-              <button class="icon-btn toggle-menu" data-target="menu3" style="width:28px;height:28px;">
-                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
-              </button>
-              <div class="menu-dropdown" id="menu3">
-                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
-                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
-                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+            <div class="col-hide-md">
+              <div class="student-email">m.ali@example.ps</div>
+              <div class="student-phone">+970 592 555 000</div>
+            </div>
+            <div class="col-hide-md col-hide-sm student-level">ابتدائية</div>
+            <div class="col-hide-md col-hide-sm student-date">٠٥ سبتمبر ٢٠٢٣</div>
+            <div><span class="badge-dot badge-inactive">معطل</span></div>
+            <div class="actions-cell">
+              <button class="menu-btn toggle-menu" data-target="menu3"><i data-lucide="more-vertical"></i></button>
+              <div class="dropdown-menu" id="menu3">
+                <button><i data-lucide="eye"></i> عرض الملف</button>
+                <button><i data-lucide="send"></i> إرسال إشعار</button>
+                <button class="danger-btn"><i data-lucide="ban"></i> تعطيل الحساب</button>
               </div>
             </div>
           </div>
 
           <!-- Row 4 -->
-          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
-            <div><input type="checkbox" class="chk"></div>
-            <div class="flex items-center gap-2">
-              <span class="avatar bg-rose-400" style="width:28px;height:28px;font-size:11px;">ل</span>
+          <div class="table-row">
+            <div><input type="checkbox" class="chk" /></div>
+            <div class="student-info">
+              <span class="avatar" style="background:#fb7185;">ل</span>
               <div>
-                <div class="font-semibold text-slate-900 text-sm leading-tight">ليلى إبراهيم جابر</div>
-                <div class="text-xs text-slate-400">#STD-4412</div>
+                <div class="student-name">ليلى إبراهيم جابر</div>
+                <div class="student-id">#STD-4412</div>
               </div>
             </div>
-            <div class="col-hide-md"><div class="text-slate-700 text-xs">laila.j@example.ps</div><div class="text-xs text-slate-400">+970 597 111 222</div></div>
-            <div class="col-hide-md text-slate-700 text-xs">الثانوية</div>
-            <div class="col-hide-md text-slate-700 text-xs">٢٠ ديسمبر ٢٠٢٣</div>
-            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
-            <div class="relative">
-              <button class="icon-btn toggle-menu" data-target="menu4" style="width:28px;height:28px;">
-                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
-              </button>
-              <div class="menu-dropdown" id="menu4">
-                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
-                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
-                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+            <div class="col-hide-md">
+              <div class="student-email">laila.j@example.ps</div>
+              <div class="student-phone">+970 597 111 222</div>
+            </div>
+            <div class="col-hide-md col-hide-sm student-level">الثانوية</div>
+            <div class="col-hide-md col-hide-sm student-date">٢٠ ديسمبر ٢٠٢٣</div>
+            <div><span class="badge-dot badge-active">نشط</span></div>
+            <div class="actions-cell">
+              <button class="menu-btn toggle-menu" data-target="menu4"><i data-lucide="more-vertical"></i></button>
+              <div class="dropdown-menu" id="menu4">
+                <button><i data-lucide="eye"></i> عرض الملف</button>
+                <button><i data-lucide="send"></i> إرسال إشعار</button>
+                <button class="danger-btn"><i data-lucide="ban"></i> تعطيل الحساب</button>
               </div>
             </div>
           </div>
 
           <!-- Row 5 -->
-          <div class="table-row row-grid grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.8fr_44px] items-center gap-3 px-3 md:px-5 py-2.5">
-            <div><input type="checkbox" class="chk"></div>
-            <div class="flex items-center gap-2">
-              <span class="avatar bg-emerald-400" style="width:28px;height:28px;font-size:11px;">خ</span>
+          <div class="table-row">
+            <div><input type="checkbox" class="chk" /></div>
+            <div class="student-info">
+              <span class="avatar" style="background:#34d399;">خ</span>
               <div>
-                <div class="font-semibold text-slate-900 text-sm leading-tight">خالد منصور</div>
-                <div class="text-xs text-slate-400">#STD-3398</div>
+                <div class="student-name">خالد منصور</div>
+                <div class="student-id">#STD-3398</div>
               </div>
             </div>
-            <div class="col-hide-md"><div class="text-slate-700 text-xs">khaled.m@example.ps</div><div class="text-xs text-slate-400">+970 594 333 444</div></div>
-            <div class="col-hide-md text-slate-700 text-xs">إعدادية</div>
-            <div class="col-hide-md text-slate-700 text-xs">٠١ يناير ٢٠٢٤</div>
-            <div><span class="badge-dot inline-flex items-center rounded-full bg-brand-100 text-brand-700 px-2 py-0.5 text-[10px] font-semibold">نشط</span></div>
-            <div class="relative">
-              <button class="icon-btn toggle-menu" data-target="menu5" style="width:28px;height:28px;">
-                <i data-lucide="more-vertical" class="w-3.5 h-3.5"></i>
-              </button>
-              <div class="menu-dropdown" id="menu5">
-                <button><i data-lucide="eye" class="w-3.5 h-3.5"></i> عرض الملف</button>
-                <button><i data-lucide="send" class="w-3.5 h-3.5"></i> إرسال إشعار</button>
-                <button class="text-rose-600"><i data-lucide="ban" class="w-3.5 h-3.5"></i> تعطيل الحساب</button>
+            <div class="col-hide-md">
+              <div class="student-email">khaled.m@example.ps</div>
+              <div class="student-phone">+970 594 333 444</div>
+            </div>
+            <div class="col-hide-md col-hide-sm student-level">إعدادية</div>
+            <div class="col-hide-md col-hide-sm student-date">٠١ يناير ٢٠٢٤</div>
+            <div><span class="badge-dot badge-active">نشط</span></div>
+            <div class="actions-cell">
+              <button class="menu-btn toggle-menu" data-target="menu5"><i data-lucide="more-vertical"></i></button>
+              <div class="dropdown-menu" id="menu5">
+                <button><i data-lucide="eye"></i> عرض الملف</button>
+                <button><i data-lucide="send"></i> إرسال إشعار</button>
+                <button class="danger-btn"><i data-lucide="ban"></i> تعطيل الحساب</button>
               </div>
             </div>
           </div>
 
-          <!-- Pagination -->
-          <div class="flex flex-wrap items-center gap-2 px-3 md:px-5 py-2.5 border-t border-slate-100 text-xs text-slate-500">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[11px]">الصفوف لكل صفحة:</span>
-              <button class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px]">١٠ <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+          <!-- PAGINATION -->
+          <div class="pagination">
+            <div class="per-page">
+              <span>الصفوف لكل صفحة:</span>
+              <select>
+                <option>١٠</option>
+                <option>٢٥</option>
+                <option>٥٠</option>
+              </select>
             </div>
-            <div class="hidden sm:block text-[11px]">عرض ١-١٠ من ٢٤٨</div>
-            <div class="ms-auto flex items-center gap-0.5">
-              <button class="page-btn" style="width:28px;height:28px;"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
-              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٢٥</button>
-              <span class="page-btn" style="width:28px;height:28px;font-size:12px;">…</span>
-              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٣</button>
-              <button class="page-btn" style="width:28px;height:28px;font-size:12px;">٢</button>
-              <button class="page-btn active" style="width:28px;height:28px;font-size:12px;">١</button>
-              <button class="page-btn" style="width:28px;height:28px;"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+            <div class="info">عرض ١-١٠ من ٢٤٨</div>
+            <div class="pages">
+              <button class="page-btn"><i data-lucide="chevron-right"></i></button>
+              <button class="page-btn">٢٥</button>
+              <button class="page-btn">…</button>
+              <button class="page-btn">٣</button>
+              <button class="page-btn">٢</button>
+              <button class="page-btn active">١</button>
+              <button class="page-btn"><i data-lucide="chevron-left"></i></button>
             </div>
           </div>
+
         </div>
       </div>
     </main>
   </div>
 
-  <!-- JavaScript -->
   <script>
     // Initialize Lucide icons
     lucide.createIcons();
 
-    // Sidebar toggle functionality
+    // ===== SIDEBAR TOGGLE =====
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
     const body = document.body;
-    const toggle = document.getElementById('sb-toggle');
-    const backdrop = document.getElementById('sb-backdrop');
     const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-    // Desktop collapsed state
-    if (localStorage.getItem('sb-collapsed') === '1') {
+    // Restore desktop collapsed state
+    if (localStorage.getItem('sb-collapsed') === '1' && !isMobile()) {
       body.classList.add('sb-collapsed');
     }
 
-    toggle.addEventListener('click', () => {
+    function toggleSidebar() {
       if (isMobile()) {
-        // On mobile: toggle sidebar open/close
-        body.classList.toggle('sb-open');
-        // Prevent body scroll when sidebar is open
-        if (body.classList.contains('sb-open')) {
-          document.body.style.overflow = 'hidden';
-        } else {
-          document.body.style.overflow = '';
-        }
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
       } else {
-        // On desktop: toggle collapsed state
         body.classList.toggle('sb-collapsed');
         localStorage.setItem('sb-collapsed', body.classList.contains('sb-collapsed') ? '1' : '0');
       }
-    });
+    }
 
-    // Close sidebar when clicking backdrop
-    backdrop.addEventListener('click', () => {
-      body.classList.remove('sb-open');
-      document.body.style.overflow = '';
-    });
+    menuToggle.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
 
     // Close sidebar on escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        body.classList.remove('sb-open');
-        document.body.style.overflow = '';
+        if (sidebar.classList.contains('open')) {
+          toggleSidebar();
+        }
       }
     });
 
-    // Close sidebar when resizing to desktop
+    // Close sidebar on resize to desktop
     window.addEventListener('resize', () => {
-      if (!isMobile()) {
-        body.classList.remove('sb-open');
+      if (!isMobile() && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
         document.body.style.overflow = '';
       }
     });
 
-    // Toggle dropdown menus
-    document.querySelectorAll('.toggle-menu').forEach(button => {
-      button.addEventListener('click', function(e) {
+    // ===== DROPDOWN MENUS =====
+    document.querySelectorAll('.toggle-menu').forEach(btn => {
+      btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        const targetId = this.getAttribute('data-target');
+        const targetId = this.dataset.target;
         const menu = document.getElementById(targetId);
         
-        document.querySelectorAll('.menu-dropdown').forEach(m => {
-          if (m.id !== targetId) {
-            m.classList.remove('show');
-          }
+        document.querySelectorAll('.dropdown-menu').forEach(m => {
+          if (m.id !== targetId) m.classList.remove('open');
         });
         
-        menu.classList.toggle('show');
+        menu.classList.toggle('open');
       });
     });
 
     document.addEventListener('click', function(e) {
-      if (!e.target.closest('.toggle-menu') && !e.target.closest('.menu-dropdown')) {
-        document.querySelectorAll('.menu-dropdown').forEach(menu => {
-          menu.classList.remove('show');
-        });
+      if (!e.target.closest('.actions-cell')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
       }
     });
 
@@ -927,5 +1378,6 @@
       lucide.createIcons();
     });
   </script>
+
 </body>
 </html>
